@@ -1,7 +1,7 @@
 Package mold
 ============
 
-Package mold is a general library to help modify or set data on data structures and other objects.
+Package mold is a general library to help modify or set data within data structures and other objects.
 
 How can this help me you ask, please see the examples [here](_examples/full/main.go)
 
