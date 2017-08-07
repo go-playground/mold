@@ -144,7 +144,7 @@ func (t *Transformer) setByStruct(ctx context.Context, current reflect.Value, ty
 		}
 	}
 
-	// run is struct has a cooresponding struct level transformation
+	// run is struct has a corresponding struct level transformation
 	if cs.fn != nil {
 		if err = cs.fn(ctx, t, current); err != nil {
 			return
