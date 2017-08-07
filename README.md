@@ -3,7 +3,7 @@ Package mold
 
 Package mold is a general library to help modify or set data on data structures and other objects.
 
-How can this help me you ask, please see the examples [here]()
+How can this help me you ask, please see the examples [here](_examples/full/main.go)
 
 Installation
 ------------
@@ -134,17 +134,11 @@ func parseForm() url.Values {
 }
 ```
 
-Benchmarks
-------
-###### Run on Dell XPS 15 i7-7700HQ 32GB using Go version go1.8.3 linux/amd64
-
-```go
-go test -run=NONE -bench=. -benchmem=true
-
-
-```
-
-Competitor benchmarks can be found [here](https://github.com/go-playground/form/blob/master/benchmarks/benchmarks.md)
+Contributing
+------------
+I am definitly interested in the communities help in adding more scrubbers and modifiers.
+Please send a PR with tests, and prefereably no extra dependencies, at lease until a solid base
+has been built.
 
 Complimentary Software
 ----------------------
