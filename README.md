@@ -1,5 +1,11 @@
 Package mold
 ============
+![Project status](https://img.shields.io/badge/version-1.0.0-green.svg)
+[![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=master)](https://travis-ci.org/go-playground/mold)
+[![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=master)](https://coveralls.io/github/go-playground/mold?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/mold)](https://goreportcard.com/report/github.com/go-playground/mold)
+[![GoDoc](https://godoc.org/github.com/go-playground/mold?status.svg)](https://godoc.org/github.com/go-playground/mold)
+![License](https://img.shields.io/dub/l/vibe-d.svg)
 
 Package mold is a general library to help modify or set data within data structures and other objects.
 
@@ -10,7 +16,7 @@ Installation
 
 Use go get.
 ```shell
-	go get -u github.com/go-playground/mold
+go get -u github.com/go-playground/mold
 ```
 
 Then import the form package into your own code.
