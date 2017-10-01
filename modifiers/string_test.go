@@ -2,7 +2,6 @@ package modifiers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"testing"
 )
@@ -24,7 +23,7 @@ func TestEmails(t *testing.T) {
 	email := "           Dean.Karn@gmail.com            "
 
 	type Test struct {
-		Email string `conform:"trimspace"`
+		Email string `mod:"trimspace"`
 	}
 
 	tt := Test{Email: email}
@@ -32,11 +31,15 @@ func TestEmails(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%+v\n", tt)
+	if tt.Email != "Dean.Karn@gmail.com" {
+		t.Fatalf("Unexpected value '%s'\n", tt.Email)
+	}
 
 	err = conform.Field(context.Background(), &email, "trimspace")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(email)
+	if email != "Dean.Karn@gmail.com" {
+		t.Fatalf("Unexpected value '%s'\n", tt.Email)
+	}
 }

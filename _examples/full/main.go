@@ -38,17 +38,17 @@ var (
 
 // Address contains address information
 type Address struct {
-	Name  string `conform:"trimspace" validate:"required"`
-	Phone string `conform:"trimspace" validate:"required"`
+	Name  string `mod:"trimspace" validate:"required"`
+	Phone string `mod:"trimspace" validate:"required"`
 }
 
 // User contains user information
 type User struct {
-	Name    string    `conform:"trimspace" validate:"required"              scrub:"name"`
-	Age     uint8     `                    validate:"required,gt=0,lt=130"`
-	Gender  string    `                    validate:"required"`
-	Email   string    `conform:"trimspace" validate:"required,email"        scrub:"emails"`
-	Address []Address `                    validate:"required,dive"`
+	Name    string    `mod:"trimspace" validate:"required"              scrub:"name"`
+	Age     uint8     `                validate:"required,gt=0,lt=130"`
+	Gender  string    `                validate:"required"`
+	Email   string    `mod:"trimspace" validate:"required,email"        scrub:"emails"`
+	Address []Address `                validate:"required,dive"`
 	Active  bool      `form:"active"`
 }
 
