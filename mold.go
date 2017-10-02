@@ -18,7 +18,7 @@ var (
 // TODO - ensure StructLevel and Func get passed an interface and not *Transform directly
 
 // Func defines a transform function for use.
-type Func func(ctx context.Context, t *Transformer, value reflect.Value) error
+type Func func(ctx context.Context, t *Transformer, value reflect.Value, param string) error
 
 // StructLevelFunc accepts all values needed for struct level validation
 type StructLevelFunc func(ctx context.Context, t *Transformer, value reflect.Value) error
@@ -240,12 +240,12 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cF
 				if !current.CanAddr() {
 					newVal := reflect.New(current.Type()).Elem()
 					newVal.Set(current)
-					if err = ct.fn(ctx, t, newVal); err != nil {
+					if err = ct.fn(ctx, t, newVal, ct.param); err != nil {
 						return
 					}
 					orig.Set(newVal)
 				} else {
-					if err = ct.fn(ctx, t, current); err != nil {
+					if err = ct.fn(ctx, t, current, ct.param); err != nil {
 						return
 					}
 				}

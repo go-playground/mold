@@ -14,9 +14,11 @@ const (
 	typeDive
 )
 
-var (
-	tagSeparator = ","
-	ignoreTag    = "-"
+const (
+	tagSeparator    = ","
+	ignoreTag       = "-"
+	tagKeySeparator = "="
+	utf8HexComma    = "0x2C"
 )
 
 type structCache struct {
@@ -82,6 +84,7 @@ type cTag struct {
 	hasTag         bool
 	fn             Func
 	next           *cTag
+	param          string
 }
 
 func (t *Transformer) extractStructCache(current reflect.Value) (*cStruct, error) {
@@ -189,14 +192,17 @@ func (t *Transformer) parseFieldTagsRecursive(tag string, fieldName string, alia
 			continue
 
 		default:
+
+			vals := strings.SplitN(tg, tagKeySeparator, 2)
+
 			if noAlias {
-				alias = tg
+				alias = vals[0]
 				current.aliasTag = alias
 			} else {
 				current.actualAliasTag = tg
 			}
 
-			current.tag = tg
+			current.tag = vals[0]
 			if len(current.tag) == 0 {
 				err = &ErrInvalidTag{tag: current.tag, field: fieldName}
 				return
@@ -205,6 +211,10 @@ func (t *Transformer) parseFieldTagsRecursive(tag string, fieldName string, alia
 			if current.fn, ok = t.transformations[current.tag]; !ok {
 				err = &ErrUndefinedTag{tag: current.tag, field: fieldName}
 				return
+			}
+
+			if len(vals) > 1 {
+				current.param = strings.Replace(vals[1], utf8HexComma, ",", -1)
 			}
 		}
 	}

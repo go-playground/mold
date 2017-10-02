@@ -20,15 +20,25 @@ var (
 )
 
 // Emails scrubs all emails found for PII compliance
-func Emails(ctx context.Context, t *mold.Transformer, v reflect.Value) error {
-	scrubbed := emailRegex.ReplaceAllStringFunc(v.String(), emailSubmatchFn)
-	v.Set(reflect.ValueOf(scrubbed))
+func Emails(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	scrubbed := emailRegex.ReplaceAllStringFunc(s, emailSubmatchFn)
+	v.SetString(scrubbed)
 	return nil
 }
 
-// FullName trims extra space from a full name
-func FullName(ctx context.Context, t *mold.Transformer, v reflect.Value) error {
-	scrubbed := fmt.Sprintf("<<scrubbed::name::sha1::%s>>", hashString(v.String()))
-	v.Set(reflect.ValueOf(scrubbed))
-	return nil
+var textFn = func(shaName string) mold.Func {
+	// Text scrubs the whole text for PII compliance
+	return func(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+		s, ok := v.Interface().(string)
+		if !ok {
+			return nil
+		}
+		scrubbed := fmt.Sprintf("<<scrubbed::%s::sha1::%s>>", shaName, hashString(s))
+		v.SetString(scrubbed)
+		return nil
+	}
 }

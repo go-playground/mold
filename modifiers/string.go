@@ -10,26 +10,82 @@ import (
 )
 
 // TrimSpace trims extra space from text
-func TrimSpace(ctx context.Context, t *mold.Transformer, v reflect.Value) error {
-	v.Set(reflect.ValueOf(strings.TrimSpace(v.String())))
+func TrimSpace(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.TrimSpace(s))
+	return nil
+}
+
+// TrimLeft trims extra left hand side of string using provided cutset
+func TrimLeft(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.TrimLeft(s, param))
+	return nil
+}
+
+// TrimRight trims extra right hand side of string using provided cutset
+func TrimRight(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.TrimRight(s, param))
+	return nil
+}
+
+// TrimPrefix trims the string of a prefix
+func TrimPrefix(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.TrimPrefix(s, param))
+	return nil
+}
+
+// TrimSuffix trims the string of a suffix
+func TrimSuffix(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.TrimSuffix(s, param))
 	return nil
 }
 
 // ToLower convert string to lower case
-func ToLower(ctx context.Context, t *mold.Transformer, v reflect.Value) error {
-	v.Set(reflect.ValueOf(strings.ToLower(v.String())))
+func ToLower(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.ToLower(s))
 	return nil
 }
 
 // ToUpper convert string to upper case
-func ToUpper(ctx context.Context, t *mold.Transformer, v reflect.Value) error {
-	v.Set(reflect.ValueOf(strings.ToUpper(v.String())))
+func ToUpper(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.ToUpper(s))
 	return nil
 }
 
 // SnakeCase converts string to snake case
-func SnakeCase(ctx context.Context, t *mold.Transformer, v reflect.Value) error {
-	v.Set(reflect.ValueOf(snakecase.Snakecase(v.String())))
+func SnakeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(snakecase.Snakecase(s))
 	return nil
 }
 
