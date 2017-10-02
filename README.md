@@ -22,7 +22,7 @@ go get -u github.com/go-playground/mold
 Then import the form package into your own code.
 
 	import "github.com/go-playground/mold"
-    
+
 Simple example
 -----
 ```go
@@ -185,6 +185,10 @@ func parseForm() url.Values {
 	}
 }
 ```
+
+Special Information
+-------------------
+- To use a comma(,) within your params replace use it's hex representation instead '0x2C' which will be replaced while caching.
 
 Contributing
 ------------
