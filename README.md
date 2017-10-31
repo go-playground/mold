@@ -204,15 +204,6 @@ Here is a list of software that compliments using this library post decoding.
 * [validator](https://github.com/go-playground/validator) - Go Struct and Field validation, including Cross Field, Cross Struct, Map, Slice and Array diving.
 * [form](https://github.com/go-playground/form) - Decodes url.Values into Go value(s) and Encodes Go value(s) into url.Values. Dual Array and Full map support.
 
-Package Versioning
-----------
-I'm jumping on the vendoring bandwagon, you should vendor this package as I will not
-be creating different version with gopkg.in like allot of my other libraries.
-
-Why? because my time is spread pretty thin maintaining all of the libraries I have + LIFE,
-it is so freeing not to worry about it and will help me keep pouring out bigger and better
-things for you the community.
-
 License
 ------
 Distributed under MIT License, please see license file in code for more details.
