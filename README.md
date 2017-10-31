@@ -1,10 +1,10 @@
 Package mold
 ============
-![Project status](https://img.shields.io/badge/version-2.0.0-green.svg)
+![Project status](https://img.shields.io/badge/version-2.1.0-green.svg)
 [![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=master)](https://travis-ci.org/go-playground/mold)
-[![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=master)](https://coveralls.io/github/go-playground/mold?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=v2)](https://coveralls.io/github/go-playground/mold?branch=v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/mold)](https://goreportcard.com/report/github.com/go-playground/mold)
-[![GoDoc](https://godoc.org/github.com/go-playground/mold?status.svg)](https://godoc.org/github.com/go-playground/mold)
+[![GoDoc](https://godoc.org/gopkg.in/go-playground/mold.v2?status.svg)](https://godoc.org/gopkg.in/go-playground/mold.v2)
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
 Package mold is a general library to help modify or set data within data structures and other objects.
@@ -16,12 +16,12 @@ Installation
 
 Use go get.
 ```shell
-go get -u github.com/go-playground/mold
+go get -u gopkg.in/go-playground/mold.v2
 ```
 
 Then import the form package into your own code.
 
-	import "github.com/go-playground/mold"
+	import "gopkg.in/go-playground/mold.v2"
 
 Simple example
 -----
@@ -34,7 +34,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/go-playground/mold"
+	"gopkg.in/go-playground/mold.v2"
 )
 
 var tform *mold.Transformer
@@ -82,8 +82,8 @@ import (
 
 	"github.com/go-playground/form"
 
-	"github.com/go-playground/mold/modifiers"
-	"github.com/go-playground/mold/scrubbers"
+	"gopkg.in/go-playground/mold.v2/modifiers"
+	"gopkg.in/go-playground/mold.v2/scrubbers"
 
 	"gopkg.in/go-playground/validator.v9"
 )

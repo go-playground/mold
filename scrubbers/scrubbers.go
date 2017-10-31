@@ -1,6 +1,6 @@
 package scrubbers
 
-import "github.com/go-playground/mold"
+import "gopkg.in/go-playground/mold.v2"
 
 // New returns a scrubber with defaults registered
 func New() *mold.Transformer {

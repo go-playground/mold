@@ -198,14 +198,18 @@ func TestBasicTransform(t *testing.T) {
 	NotEqual(t, err, nil)
 	Equal(t, err.Error(), "mold: Field(nil)")
 
+	done := make(chan struct{})
 	go func() {
 		err := set.Field(context.Background(), &tString, "nonexistant")
 		NotEqual(t, err, nil)
+		close(done)
 	}()
+
 	err = set.Field(context.Background(), &tt6.String, "nonexistant")
 	NotEqual(t, err, nil)
 	Equal(t, err.Error(), "unregistered/undefined transformation 'nonexistant' found on field")
 
+	<-done
 	set.Register("dummy", func(ctx context.Context, t *Transformer, value reflect.Value, param string) error { return nil })
 	err = set.Field(context.Background(), &tt6.String, "dummy")
 	Equal(t, err, nil)

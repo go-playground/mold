@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-playground/form"
 
-	"github.com/go-playground/mold/modifiers"
-	"github.com/go-playground/mold/scrubbers"
+	"gopkg.in/go-playground/mold.v2/modifiers"
+	"gopkg.in/go-playground/mold.v2/scrubbers"
 
 	"gopkg.in/go-playground/validator.v9"
 )

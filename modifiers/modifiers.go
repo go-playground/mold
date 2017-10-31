@@ -1,18 +1,18 @@
 package modifiers
 
-import "github.com/go-playground/mold"
+import "gopkg.in/go-playground/mold.v2"
 
 // New returns a modifier with defaults registered
 func New() *mold.Transformer {
-	scrub := mold.New()
-	scrub.SetTagName("mod")
-	scrub.Register("trim", TrimSpace)
-	scrub.Register("ltrim", TrimLeft)
-	scrub.Register("rtrim", TrimRight)
-	scrub.Register("tprefix", TrimPrefix)
-	scrub.Register("tsuffix", TrimSuffix)
-	scrub.Register("lcase", ToLower)
-	scrub.Register("ucase", ToUpper)
-	scrub.Register("snake", SnakeCase)
-	return scrub
+	mod := mold.New()
+	mod.SetTagName("mod")
+	mod.Register("trim", TrimSpace)
+	mod.Register("ltrim", TrimLeft)
+	mod.Register("rtrim", TrimRight)
+	mod.Register("tprefix", TrimPrefix)
+	mod.Register("tsuffix", TrimSuffix)
+	mod.Register("lcase", ToLower)
+	mod.Register("ucase", ToUpper)
+	mod.Register("snake", SnakeCase)
+	return mod
 }

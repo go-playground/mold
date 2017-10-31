@@ -1,9 +1,12 @@
 package mold
 
-var (
+const (
 	diveTag            = "dive"
 	restrictedTagChars = ".[],|=+()`~!@#$%^&*\\\"/?<>{}"
-	restrictedTags     = map[string]struct{}{
+)
+
+var (
+	restrictedTags = map[string]struct{}{
 		diveTag:   {},
 		ignoreTag: {},
 	}
