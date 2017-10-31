@@ -1,7 +1,7 @@
 Package mold
 ============
 ![Project status](https://img.shields.io/badge/version-2.1.0-green.svg)
-[![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=master)](https://travis-ci.org/go-playground/mold)
+[![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=v2)](https://travis-ci.org/go-playground/mold)
 [![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=v2)](https://coveralls.io/github/go-playground/mold?branch=v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/mold)](https://goreportcard.com/report/github.com/go-playground/mold)
 [![GoDoc](https://godoc.org/gopkg.in/go-playground/mold.v2?status.svg)](https://godoc.org/gopkg.in/go-playground/mold.v2)
