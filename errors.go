@@ -7,6 +7,17 @@ import (
 	"strings"
 )
 
+var (
+	// ErrInvalidDive describes an invalid dive tag configuration
+	ErrInvalidDive = errors.New("Invalid dive tag configuration")
+
+	// ErrUndefinedKeysTag describes an undefined keys tag when and endkeys tag defined
+	ErrUndefinedKeysTag = errors.New("'" + endKeysTag + "' tag encountered without a corresponding '" + keysTag + "' tag")
+
+	// ErrInvalidKeysTag describes a misuse of the keys tag
+	ErrInvalidKeysTag = errors.New("'" + keysTag + "' tag must be immediately preceeded by the '" + diveTag + "' tag")
+)
+
 // ErrUndefinedTag defines a tag that does not exist
 type ErrUndefinedTag struct {
 	tag   string
@@ -58,6 +69,3 @@ type ErrInvalidTransformation struct {
 func (e *ErrInvalidTransformation) Error() string {
 	return "mold: (nil " + e.typ.String() + ")"
 }
-
-// ErrInvalidDive describes an invalid dive tag configuration
-var ErrInvalidDive = errors.New("Invalid dive tag configuration")
