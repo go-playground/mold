@@ -12,13 +12,12 @@ type tagType uint8
 const (
 	typeDefault tagType = iota
 	typeDive
+	typeKeys
+	typeEndKeys
 )
 
 const (
-	tagSeparator    = ","
-	ignoreTag       = "-"
-	tagKeySeparator = "="
-	utf8HexComma    = "0x2C"
+	keysTagNotDefined = "'" + endKeysTag + "' tag encountered without a corresponding '" + keysTag + "' tag"
 )
 
 type structCache struct {
@@ -83,6 +82,7 @@ type cTag struct {
 	typeof         tagType
 	hasTag         bool
 	fn             Func
+	keys           *cTag
 	next           *cTag
 	param          string
 }
@@ -177,10 +177,13 @@ func (t *Transformer) parseFieldTagsRecursive(tag string, fieldName string, alia
 			continue
 		}
 
+		var prevTag tagType
+
 		if i == 0 {
 			current = &cTag{aliasTag: alias, hasAlias: hasAlias, hasTag: true}
 			firstCtag = current
 		} else {
+			prevTag = current.typeof
 			current.next = &cTag{aliasTag: alias, hasAlias: hasAlias, hasTag: true}
 			current = current.next
 		}
@@ -190,6 +193,47 @@ func (t *Transformer) parseFieldTagsRecursive(tag string, fieldName string, alia
 		case diveTag:
 			current.typeof = typeDive
 			continue
+
+		case keysTag:
+			current.typeof = typeKeys
+
+			if i == 0 || prevTag != typeDive {
+				err = ErrInvalidKeysTag
+				return
+			}
+
+			current.typeof = typeKeys
+
+			// need to pass along only keys tag
+			// need to increment i to skip over the keys tags
+			b := make([]byte, 0, 64)
+
+			i++
+
+			for ; i < len(tags); i++ {
+
+				b = append(b, tags[i]...)
+				b = append(b, ',')
+
+				if tags[i] == endKeysTag {
+					break
+				}
+			}
+
+			if current.keys, _, err = t.parseFieldTagsRecursive(string(b[:len(b)-1]), fieldName, "", false); err != nil {
+				return
+			}
+			continue
+
+		case endKeysTag:
+			current.typeof = typeEndKeys
+
+			// if there are more in tags then there was no keysTag defined
+			// and an error should be thrown
+			if i != len(tags)-1 {
+				err = ErrUndefinedKeysTag
+			}
+			return
 
 		default:
 

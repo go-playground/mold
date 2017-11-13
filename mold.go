@@ -206,6 +206,8 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cF
 			}
 
 			switch ct.typeof {
+			case typeEndKeys:
+				return
 			case typeDive:
 				ct = ct.next
 
@@ -222,11 +224,37 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cF
 				case reflect.Map:
 					reusableCF := &cField{}
 
+					hasKeys := ct != nil && ct.typeof == typeKeys && ct.keys != nil
+
 					for _, key := range current.MapKeys() {
 						newVal := reflect.New(current.Type().Elem()).Elem()
 						newVal.Set(current.MapIndex(key))
-						if err = t.setByField(ctx, newVal, reusableCF, ct); err != nil {
-							return
+
+						if hasKeys {
+
+							// remove current map key as we may be changing it
+							// and re-add to the map afterwards
+							current.SetMapIndex(key, reflect.Value{})
+
+							newKey := reflect.New(current.Type().Key()).Elem()
+							newKey.Set(key)
+							key = newKey
+
+							// handle map key
+							if err = t.setByField(ctx, key, reusableCF, ct.keys); err != nil {
+								return
+							}
+
+							// can be nil when just keys being validated
+							if ct.next != nil {
+								if err = t.setByField(ctx, newVal, reusableCF, ct.next); err != nil {
+									return
+								}
+							}
+						} else {
+							if err = t.setByField(ctx, newVal, reusableCF, ct); err != nil {
+								return
+							}
 						}
 						current.SetMapIndex(key, newVal)
 					}

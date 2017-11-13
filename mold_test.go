@@ -544,3 +544,60 @@ func TestParam(t *testing.T) {
 	Equal(t, err, nil)
 	Equal(t, tt.String, "test")
 }
+
+func TestDiveKeys(t *testing.T) {
+
+	type Test struct {
+		Map map[string]string `s:"dive,keys,default,endkeys,default"`
+	}
+
+	set := New()
+	set.SetTagName("s")
+	set.Register("default", func(ctx context.Context, t *Transformer, value reflect.Value, param string) error {
+		value.Set(reflect.ValueOf("after"))
+		return nil
+	})
+	set.Register("err", func(ctx context.Context, t *Transformer, value reflect.Value, param string) error {
+		return errors.New("err")
+	})
+
+	test := Test{
+		Map: map[string]string{
+			"b4": "b4",
+		},
+	}
+
+	err := set.Struct(context.Background(), &test)
+	Equal(t, err, nil)
+
+	val := test.Map["after"]
+	Equal(t, val, "after")
+
+	m := map[string]string{
+		"b4": "b4",
+	}
+
+	err = set.Field(context.Background(), &m, "dive,keys,default,endkeys,default")
+	Equal(t, err, nil)
+
+	val = m["after"]
+	Equal(t, val, "after")
+
+	err = set.Field(context.Background(), &m, "keys,endkeys,default")
+	Equal(t, err, ErrInvalidKeysTag)
+
+	err = set.Field(context.Background(), &m, "dive,endkeys,default")
+	Equal(t, err, ErrUndefinedKeysTag)
+
+	err = set.Field(context.Background(), &m, "dive,keys,undefinedtag")
+	Equal(t, err, ErrUndefinedTag{tag: "undefinedtag"})
+
+	err = set.Field(context.Background(), &m, "dive,keys,err,endkeys")
+	NotEqual(t, err, nil)
+
+	m = map[string]string{
+		"b4": "b4",
+	}
+	err = set.Field(context.Background(), &m, "dive,keys,default,endkeys,err")
+	NotEqual(t, err, nil)
+}
