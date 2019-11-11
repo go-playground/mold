@@ -6,7 +6,7 @@ import (
 	"log"
 	"reflect"
 
-	"gopkg.in/go-playground/mold.v2"
+	"github.com/go-playground/mold/v3"
 )
 
 var tform *mold.Transformer

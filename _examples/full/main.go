@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/go-playground/form"
+	"github.com/go-playground/form/v4"
 
-	"gopkg.in/go-playground/mold.v2/modifiers"
-	"gopkg.in/go-playground/mold.v2/scrubbers"
+	"github.com/go-playground/mold/v3/modifiers"
+	"github.com/go-playground/mold/v3/scrubbers"
 
 	"gopkg.in/go-playground/validator.v9"
 )

@@ -1,7 +1,6 @@
 language: go
 go:
-    - 1.8.5
-    - 1.9.2
+    - 1.13.4
     - tip
 matrix:
   allow_failures:
@@ -20,8 +19,6 @@ before_install:
   - go get -u github.com/golang/lint/golint
   - go get -u github.com/gordonklaus/ineffassign
   - go get -u github.com/client9/misspell/cmd/misspell
-  - mkdir -p $GOPATH/src/gopkg.in
-  - ln -s $GOPATH/src/github.com/$TRAVIS_REPO_SLUG $GOPATH/src/gopkg.in/mold.v2
 
 before_script:
   - go vet ./...
@@ -35,6 +32,6 @@ script:
  - go test -race ./...
 
 after_success: |
-  [ $TRAVIS_GO_VERSION = 1.9.2 ] &&
+  [ $TRAVIS_GO_VERSION = 1.13.4 ] &&
   overalls -project="github.com/go-playground/mold" -covermode=count -ignore=.git,_examples -debug &&
   goveralls -coverprofile=overalls.coverprofile -service travis-ci -repotoken $COVERALLS_TOKEN

@@ -2,11 +2,11 @@ package modifiers
 
 import (
 	"context"
+	"github.com/go-playground/mold/v3"
 	"reflect"
 	"strings"
 
 	snakecase "github.com/segmentio/go-snakecase"
-	"gopkg.in/go-playground/mold.v2"
 )
 
 // TrimSpace trims extra space from text
