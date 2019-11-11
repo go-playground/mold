@@ -18,14 +18,12 @@ before_install:
   - go get -u golang.org/x/tools/cmd/cover
   - go get -u github.com/gordonklaus/ineffassign
   - go get -u github.com/client9/misspell/cmd/misspell
-  - curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
 
 before_script:
   - go vet ./...
 
 script:
  - gofmt -d -s .
- - ./bin/golangci-lint run
  - ineffassign ./
  - find . -type f | xargs misspell -source=text
  - go test -race ./...
