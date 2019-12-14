@@ -601,3 +601,72 @@ func TestDiveKeys(t *testing.T) {
 	err = set.Field(context.Background(), &m, "dive,keys,default,endkeys,err")
 	NotEqual(t, err, nil)
 }
+
+func TestStructArray(t *testing.T) {
+	type InnerStruct struct {
+		String string `s:"defaultStr"`
+	}
+
+	type Test struct {
+		Inner    InnerStruct
+		Arr      []InnerStruct `s:"defaultArr"`
+		ArrDive  []InnerStruct `s:"defaultArr,dive"`
+		ArrNoTag []InnerStruct
+	}
+
+	set := New()
+	set.SetTagName("s")
+	set.Register("defaultArr", func(ctx context.Context, t *Transformer, value reflect.Value, param string) error {
+		if HasValue(value) {
+			return nil
+		}
+		value.Set(reflect.MakeSlice(value.Type(), 2, 2))
+		return nil
+	})
+	set.Register("defaultStr", func(ctx context.Context, t *Transformer, value reflect.Value, param string) error {
+		if value.String() == "ok" {
+			return errors.New("ALREADY OK")
+		}
+		value.SetString("default")
+		return nil
+	})
+
+	var tt Test
+
+	err := set.Struct(context.Background(), &tt)
+	Equal(t, err, nil)
+	Equal(t, len(tt.Arr), 2)
+	Equal(t, len(tt.ArrDive), 2)
+	Equal(t, tt.Arr[0].String, "default")
+	Equal(t, tt.Arr[1].String, "default")
+	Equal(t, tt.ArrDive[0].String, "default")
+	Equal(t, tt.ArrDive[1].String, "default")
+
+	Equal(t, tt.Inner.String, "default")
+
+	tt2 := Test{
+		Arr: make([]InnerStruct, 1),
+	}
+
+	err = set.Struct(context.Background(), &tt2)
+	Equal(t, err, nil)
+	Equal(t, len(tt2.Arr), 1)
+	Equal(t, tt2.Arr[0].String, "default")
+
+	tt3 := Test{
+		Arr: []InnerStruct{{"ok"}},
+	}
+
+	err = set.Struct(context.Background(), &tt3)
+	NotEqual(t, err, nil)
+	Equal(t, err.Error(), "ALREADY OK")
+
+	tt4 := Test{
+		ArrNoTag: make([]InnerStruct, 1),
+	}
+
+	err = set.Struct(context.Background(), &tt4)
+	Equal(t, err, nil)
+	Equal(t, len(tt4.ArrNoTag), 1)
+	Equal(t, tt4.ArrNoTag[0].String, "default")
+}
