@@ -10,7 +10,6 @@ import (
 
 var (
 	timeType           = reflect.TypeOf(time.Time{})
-	defaultCField      = &cField{}
 	restrictedAliasErr = "Alias '%s' either contains restricted characters or is the same as a restricted tag needed for normal operation"
 	restrictedTagErr   = "Tag '%s' either contains restricted characters or is the same as a restricted tag needed for normal operation"
 )
@@ -76,7 +75,6 @@ func (t *Transformer) Register(tag string, fn Func) {
 	if ok || strings.ContainsAny(tag, restrictedTagChars) {
 		panic(fmt.Sprintf(restrictedTagErr, tag))
 	}
-
 	t.transformations[tag] = fn
 }
 
@@ -132,11 +130,10 @@ func (t *Transformer) Struct(ctx context.Context, v interface{}) error {
 	if val.Kind() != reflect.Struct || val.Type() == timeType {
 		return &ErrInvalidTransformation{typ: reflect.TypeOf(v)}
 	}
-
-	return t.setByStruct(ctx, val, typ, nil)
+	return t.setByStruct(ctx, val, typ)
 }
 
-func (t *Transformer) setByStruct(ctx context.Context, current reflect.Value, typ reflect.Type, ct *cTag) (err error) {
+func (t *Transformer) setByStruct(ctx context.Context, current reflect.Value, typ reflect.Type) (err error) {
 	cs, ok := t.cCache.Get(typ)
 	if !ok {
 		if cs, err = t.extractStructCache(current); err != nil {
@@ -155,7 +152,7 @@ func (t *Transformer) setByStruct(ctx context.Context, current reflect.Value, ty
 
 	for i := 0; i < len(cs.fields); i++ {
 		f = cs.fields[i]
-		if err = t.setByField(ctx, current.Field(f.idx), f, f.cTags); err != nil {
+		if err = t.setByField(ctx, current.Field(f.idx), f.cTags); err != nil {
 			return
 		}
 	}
@@ -192,11 +189,11 @@ func (t *Transformer) Field(ctx context.Context, v interface{}, tags string) (er
 		}
 		t.tCache.lock.Unlock()
 	}
-	err = t.setByField(ctx, val, defaultCField, ctag)
+	err = t.setByField(ctx, val, ctag)
 	return
 }
 
-func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cField, ct *cTag) (err error) {
+func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cTag) (err error) {
 	current, kind := extractType(orig)
 
 	if ct != nil && ct.hasTag {
@@ -209,52 +206,9 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cF
 
 				switch kind {
 				case reflect.Slice, reflect.Array:
-					reusableCF := &cField{}
-
-					for i := 0; i < current.Len(); i++ {
-						if err = t.setByField(ctx, current.Index(i), reusableCF, ct); err != nil {
-							return
-						}
-					}
-
+					err = t.setByIterable(ctx, current, ct)
 				case reflect.Map:
-					reusableCF := &cField{}
-
-					hasKeys := ct != nil && ct.typeof == typeKeys && ct.keys != nil
-
-					for _, key := range current.MapKeys() {
-						newVal := reflect.New(current.Type().Elem()).Elem()
-						newVal.Set(current.MapIndex(key))
-
-						if hasKeys {
-
-							// remove current map key as we may be changing it
-							// and re-add to the map afterwards
-							current.SetMapIndex(key, reflect.Value{})
-
-							newKey := reflect.New(current.Type().Key()).Elem()
-							newKey.Set(key)
-							key = newKey
-
-							// handle map key
-							if err = t.setByField(ctx, key, reusableCF, ct.keys); err != nil {
-								return
-							}
-
-							// can be nil when just keys being validated
-							if ct.next != nil {
-								if err = t.setByField(ctx, newVal, reusableCF, ct.next); err != nil {
-									return
-								}
-							}
-						} else {
-							if err = t.setByField(ctx, newVal, reusableCF, ct); err != nil {
-								return
-							}
-						}
-						current.SetMapIndex(key, newVal)
-					}
-
+					err = t.setByMap(ctx, current, ct)
 				default:
 					err = ErrInvalidDive
 				}
@@ -296,13 +250,60 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cF
 			newVal := reflect.New(typ).Elem()
 			newVal.Set(current)
 
-			if err = t.setByStruct(ctx, newVal, typ, ct); err != nil {
+			if err = t.setByStruct(ctx, newVal, typ); err != nil {
 				return
 			}
 			orig.Set(newVal)
 			return
 		}
-		err = t.setByStruct(ctx, current, typ, ct)
+		err = t.setByStruct(ctx, current, typ)
 	}
 	return
+}
+
+func (t *Transformer) setByIterable(ctx context.Context, current reflect.Value, ct *cTag) (err error) {
+	for i := 0; i < current.Len(); i++ {
+		if err = t.setByField(ctx, current.Index(i), ct); err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (t *Transformer) setByMap(ctx context.Context, current reflect.Value, ct *cTag) error {
+	hasKeys := ct != nil && ct.typeof == typeKeys && ct.keys != nil
+
+	for _, key := range current.MapKeys() {
+		newVal := reflect.New(current.Type().Elem()).Elem()
+		newVal.Set(current.MapIndex(key))
+
+		if hasKeys {
+			// remove current map key as we may be changing it
+			// and re-add to the map afterwards
+			current.SetMapIndex(key, reflect.Value{})
+
+			newKey := reflect.New(current.Type().Key()).Elem()
+			newKey.Set(key)
+			key = newKey
+
+			// handle map key
+			if err := t.setByField(ctx, key, ct.keys); err != nil {
+				return err
+			}
+
+			// can be nil when just keys being validated
+			if ct.next != nil {
+				if err := t.setByField(ctx, newVal, ct.next); err != nil {
+					return err
+				}
+			}
+		} else {
+			if err := t.setByField(ctx, newVal, ct); err != nil {
+				return err
+			}
+		}
+		current.SetMapIndex(key, newVal)
+	}
+
+	return nil
 }
