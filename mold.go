@@ -199,12 +199,8 @@ func (t *Transformer) Field(ctx context.Context, v interface{}, tags string) (er
 func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, cf *cField, ct *cTag) (err error) {
 	current, kind := extractType(orig)
 
-	if ct.hasTag {
-		for {
-			if ct == nil {
-				break
-			}
-
+	if ct != nil && ct.hasTag {
+		for ct != nil {
 			switch ct.typeof {
 			case typeEndKeys:
 				return

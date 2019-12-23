@@ -11,7 +11,7 @@ import (
 	"github.com/go-playground/mold/v3/modifiers"
 	"github.com/go-playground/mold/v3/scrubbers"
 
-	"gopkg.in/go-playground/validator.v9"
+	"github.com/go-playground/validator/v10"
 )
 
 // This example is centered around a form post, but doesn't have to be
