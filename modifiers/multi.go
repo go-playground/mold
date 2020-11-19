@@ -10,10 +10,6 @@ import (
 	"github.com/go-playground/mold/v3"
 )
 
-var (
-	timeDurationType = reflect.TypeOf(time.Duration(0))
-)
-
 //
 // Default allows setting of a default value IF no value is already present.
 //

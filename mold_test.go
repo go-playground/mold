@@ -27,9 +27,8 @@ func TestBadValues(t *testing.T) {
 	tform.Register("blah", func(ctx context.Context, t *Transformer, value reflect.Value, param string) error { return nil })
 
 	type Test struct {
-		unexposed string
-		Ignore    string `mold:"-"`
-		String    string `mold:"blah,,blah"`
+		Ignore string `mold:"-"`
+		String string `mold:"blah,,blah"`
 	}
 
 	var tt Test

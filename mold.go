@@ -242,9 +242,6 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 		if typ == timeType {
 			return
 		}
-		if ct != nil {
-			ct = ct.next
-		}
 
 		if !current.CanAddr() {
 			newVal := reflect.New(typ).Elem()

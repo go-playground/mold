@@ -16,10 +16,6 @@ const (
 	typeEndKeys
 )
 
-const (
-	keysTagNotDefined = "'" + endKeysTag + "' tag encountered without a corresponding '" + keysTag + "' tag"
-)
-
 type structCache struct {
 	lock sync.Mutex
 	m    atomic.Value // map[reflect.Type]*cStruct
@@ -131,7 +127,7 @@ func (t *Transformer) extractStructCache(current reflect.Value) (*cStruct, error
 		} else {
 			// even if field doesn't have validations need cTag for traversing to potential inner/nested
 			// elements of the field.
-			ctag = new(cTag)
+			ctag = &cTag{typeof: typeDefault}
 		}
 
 		cs.fields = append(cs.fields, &cField{

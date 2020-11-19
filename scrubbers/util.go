@@ -8,6 +8,6 @@ import (
 
 func hashString(input string) string {
 	h := sha1.New()
-	io.WriteString(h, input)
+	_, _ = io.WriteString(h, input)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
