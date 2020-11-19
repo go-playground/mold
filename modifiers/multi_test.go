@@ -12,10 +12,11 @@ func TestDefault(t *testing.T) {
 	conform := New()
 
 	tests := []struct {
-		name     string
-		field    interface{}
-		tags     string
-		expected interface{}
+		name        string
+		field       interface{}
+		tags        string
+		expected    interface{}
+		expectError bool
 	}{
 		{
 			name:     "default string",
@@ -53,6 +54,36 @@ func TestDefault(t *testing.T) {
 			tags:     "default=1s",
 			expected: time.Duration(1_000_000_000),
 		},
+		{
+			name:        "bad default time.Duration",
+			field:       time.Duration(0),
+			tags:        "default=rex",
+			expectError: true,
+		},
+		{
+			name:        "bad default int",
+			field:       0,
+			tags:        "default=abc",
+			expectError: true,
+		},
+		{
+			name:        "bad default uint",
+			field:       uint(0),
+			tags:        "default=abc",
+			expectError: true,
+		},
+		{
+			name:        "bad default float",
+			field:       float32(0),
+			tags:        "default=abc",
+			expectError: true,
+		},
+		{
+			name:        "bad default bool",
+			field:       false,
+			tags:        "default=blue",
+			expectError: true,
+		},
 	}
 
 	for _, tc := range tests {
@@ -60,6 +91,10 @@ func TestDefault(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			err := conform.Field(context.Background(), &tc.field, tc.tags)
+			if tc.expectError {
+				NotEqual(t, err, nil)
+				return
+			}
 			Equal(t, err, nil)
 			Equal(t, tc.field, tc.expected)
 		})
