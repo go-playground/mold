@@ -2,7 +2,6 @@ package modifiers
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -17,8 +16,6 @@ func Default(ctx context.Context, t *mold.Transformer, v reflect.Value, param st
 	if !v.IsZero() {
 		return nil
 	}
-
-	fmt.Println(param, v.Type())
 
 	switch v.Interface().(type) {
 	case string:
