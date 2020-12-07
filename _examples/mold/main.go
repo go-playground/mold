@@ -35,7 +35,7 @@ func main() {
 	fmt.Println(myString)
 }
 
-func transformMyData(ctx context.Context, t *mold.Transformer, value reflect.Value, param string) error {
+func transformMyData(_ context.Context, _ *mold.Transformer, value reflect.Value, _ string) error {
 	value.SetString("test")
 	return nil
 }

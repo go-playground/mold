@@ -13,7 +13,7 @@ import (
 //
 // Default allows setting of a default value IF no value is already present.
 //
-func Default(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+func Default(_ context.Context, _ *mold.Transformer, v reflect.Value, param string) error {
 	if !v.IsZero() {
 		return nil
 	}
