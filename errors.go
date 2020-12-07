@@ -9,7 +9,7 @@ import (
 
 var (
 	// ErrInvalidDive describes an invalid dive tag configuration
-	ErrInvalidDive = errors.New("Invalid dive tag configuration")
+	ErrInvalidDive = errors.New("invalid dive tag configuration")
 
 	// ErrUndefinedKeysTag describes an undefined keys tag when and endkeys tag defined
 	ErrUndefinedKeysTag = errors.New("'" + endKeysTag + "' tag encountered without a corresponding '" + keysTag + "' tag")
