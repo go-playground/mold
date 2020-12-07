@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	snakecase "github.com/segmentio/go-snakecase"
+	"github.com/segmentio/go-snakecase"
 )
 
 // TrimSpace trims extra space from text
