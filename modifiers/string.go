@@ -89,6 +89,16 @@ func SnakeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 	return nil
 }
 
+// TitleCase converts string to title case, e.g. "this is a sentence" -> "This Is A Sentence"
+func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.Title(s))
+	return nil
+}
+
 // TODO: Add more
 // - Snake_Case - can be combined with lowercase
 // - CamelCase
