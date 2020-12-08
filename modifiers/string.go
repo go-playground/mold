@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-playground/mold/v3"
 	"reflect"
+	"regexp"
 	"strings"
 
 	snakecase "github.com/segmentio/go-snakecase"
@@ -86,6 +87,28 @@ func SnakeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 		return nil
 	}
 	v.SetString(snakecase.Snakecase(s))
+	return nil
+}
+
+// AlphaCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
+// From https://github.com/leebenson/conform
+func AlphaCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(regexp.MustCompile(`[^\pL]`).ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
+// NotAlphaCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
+// From https://github.com/leebenson/conform
+func NotAlphaCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(regexp.MustCompile(`[\pL]`).ReplaceAllLiteralString(s, ""))
 	return nil
 }
 

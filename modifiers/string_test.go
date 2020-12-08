@@ -383,3 +383,95 @@ func TestSnakeCase(t *testing.T) {
 		t.Fatalf("Unexpected value '%v'\n", iface)
 	}
 }
+
+func TestAlphaCase(t *testing.T) {
+	conform := New()
+
+	s := "!@£$%^&'()Hello 1234567890 World+[];\\"
+	expected := "HelloWorld"
+
+	type Test struct {
+		String string `mod:"alpha"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "alpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "alpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "alpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
+
+func TestNotAlphaCase(t *testing.T) {
+	conform := New()
+
+	s := "Everything's here but the letters!"
+	expected := "'    !"
+
+	type Test struct {
+		String string `mod:"notalpha"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "notalpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "notalpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "notalpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
