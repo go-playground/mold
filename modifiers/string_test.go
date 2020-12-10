@@ -383,3 +383,49 @@ func TestSnakeCase(t *testing.T) {
 		t.Fatalf("Unexpected value '%v'\n", iface)
 	}
 }
+
+func TestTitleCase(t *testing.T) {
+	conform := New()
+
+	s := "this is a sentence"
+	expected := "This Is A Sentence"
+
+	type Test struct {
+		String string `mod:"title"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "title")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "title")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "title")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
