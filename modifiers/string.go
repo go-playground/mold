@@ -2,11 +2,13 @@ package modifiers
 
 import (
 	"context"
-	"github.com/go-playground/mold/v3"
 	"reflect"
 	"strings"
 
-	"github.com/segmentio/go-snakecase"
+	"github.com/go-playground/mold/v3"
+
+	"github.com/segmentio/go-camelcase"
+	snakecase "github.com/segmentio/go-snakecase"
 )
 
 // TrimSpace trims extra space from text
@@ -96,6 +98,16 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 		return nil
 	}
 	v.SetString(strings.Title(s))
+	return nil
+}
+
+// CamelCase converts string to camel case
+func CamelCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(camelcase.Camelcase(s))
 	return nil
 }
 
