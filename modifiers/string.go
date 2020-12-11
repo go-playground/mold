@@ -2,11 +2,13 @@ package modifiers
 
 import (
 	"context"
-	"github.com/go-playground/mold/v3"
 	"reflect"
+	"regexp"
 	"strings"
 
-	"github.com/segmentio/go-snakecase"
+	"github.com/go-playground/mold/v3"
+
+	snakecase "github.com/segmentio/go-snakecase"
 )
 
 // TrimSpace trims extra space from text
@@ -96,6 +98,32 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 		return nil
 	}
 	v.SetString(strings.Title(s))
+	return nil
+}
+
+var stripNumRegex = regexp.MustCompile("[^0-9]")
+
+// StripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
+// From https://github.com/leebenson/conform
+func StripAlphaCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(stripNumRegex.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
+var stripAlphaRegex = regexp.MustCompile("[0-9]")
+
+// StripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
+// From https://github.com/leebenson/conform
+func StripNumCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(stripAlphaRegex.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 

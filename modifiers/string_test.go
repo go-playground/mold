@@ -429,3 +429,95 @@ func TestTitleCase(t *testing.T) {
 		t.Fatalf("Unexpected value '%v'\n", iface)
 	}
 }
+
+func TestNumCase(t *testing.T) {
+	conform := New()
+
+	s := "the price is €30,38"
+	expected := "3038"
+
+	type Test struct {
+		String string `mod:"strip_alpha"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "strip_alpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "strip_alpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "strip_alpha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
+
+func TestNotNumCase(t *testing.T) {
+	conform := New()
+
+	s := "39472349D34a34v69e8932747"
+	expected := "Dave"
+
+	type Test struct {
+		String string `mod:"strip_num"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "strip_num")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "strip_num")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "strip_num")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
