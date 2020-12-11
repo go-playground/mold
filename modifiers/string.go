@@ -127,6 +127,32 @@ func StripNumCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ str
 	return nil
 }
 
+var StripNumUnicodeRegex = regexp.MustCompile(`[^\pL]`)
+
+// StripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
+// From https://github.com/leebenson/conform
+func StripNumUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(StripNumUnicodeRegex.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
+var StripAlphaUnicode = regexp.MustCompile(`[\pL]`)
+
+// StripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
+// From https://github.com/leebenson/conform
+func StripAlphaUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(StripAlphaUnicode.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
 // TODO: Add more
 // - Snake_Case - can be combined with lowercase
 // - CamelCase
