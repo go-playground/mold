@@ -118,7 +118,7 @@ func NameCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param s
 		return nil
 	}
 	first := onlyOne(strings.ToLower(s), namePatterns)
-	v.SetString(strings.Title(regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]|\-|\']*[\p{L}])*`).FindString(first)))
+	v.SetString(strings.Title(regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`).FindString(first)))
 	return nil
 }
 
