@@ -2,11 +2,12 @@ package modifiers
 
 import (
 	"context"
-	"github.com/go-playground/mold/v3"
 	"reflect"
+	"regexp"
 	"strings"
 
-	"github.com/segmentio/go-snakecase"
+	"github.com/go-playground/mold/v3"
+	snakecase "github.com/segmentio/go-snakecase"
 )
 
 // TrimSpace trims extra space from text
@@ -97,6 +98,37 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 	}
 	v.SetString(strings.Title(s))
 	return nil
+}
+
+var namePatterns = []map[string]string{
+	{`[^\pL-\s']`: ""}, // cut off everything except [ alpha, hyphen, whitespace, apostrophe]
+	{`\s{2,}`: " "},    // trim more than two whitespaces to one
+	{`-{2,}`: "-"},     // trim more than two hyphens to one
+	{`'{2,}`: "'"},     // trim more than two apostrophes to one
+	{`( )*-( )*`: "-"}, // trim enclosing whitespaces around hyphen
+}
+
+// NameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
+// converts multiple spaces and dashes to single characters, title cases multiple names.
+// Example: "3493€848Jo-$%£@Ann " -> "Jo-Ann", " ~~ The Dude ~~" -> "The Dude", "**susan**" -> "Susan",
+// " hugh fearnley-whittingstall" -> "Hugh Fearnley-Whittingstall"
+func NameCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	first := onlyOne(strings.ToLower(s), namePatterns)
+	v.SetString(strings.Title(regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]|\-|\']*[\p{L}])*`).FindString(first)))
+	return nil
+}
+
+func onlyOne(s string, m []map[string]string) string {
+	for _, v := range m {
+		for f, r := range v {
+			s = regexp.MustCompile(f).ReplaceAllLiteralString(s, r)
+		}
+	}
+	return s
 }
 
 // TODO: Add more
