@@ -521,7 +521,7 @@ func TestTimeType(t *testing.T) {
 
 	err = set.Field(context.Background(), &tt, "default,dive")
 	NotEqual(t, err, nil)
-	Equal(t, err.Error(), "invalid dive tag configuration")
+	Equal(t, err, ErrInvalidDive)
 }
 
 func TestParam(t *testing.T) {
