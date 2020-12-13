@@ -7,10 +7,8 @@ import (
 	"net/url"
 
 	"github.com/go-playground/form/v4"
-
-	"github.com/go-playground/mold/v3/modifiers"
-	"github.com/go-playground/mold/v3/scrubbers"
-
+	"github.com/go-playground/mold/v4/modifiers"
+	"github.com/go-playground/mold/v4/scrubbers"
 	"github.com/go-playground/validator/v10"
 )
 

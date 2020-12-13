@@ -1,7 +1,7 @@
 package modifiers
 
 import (
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 )
 
 // New returns a modifier with defaults registered

@@ -1,6 +1,6 @@
 Package mold
 ============
-![Project status](https://img.shields.io/badge/version-3.1.1-green.svg)
+![Project status](https://img.shields.io/badge/version-4.0.0-green.svg)
 [![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=v2)](https://travis-ci.org/go-playground/mold)
 [![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=v2)](https://coveralls.io/github/go-playground/mold?branch=v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/mold)](https://goreportcard.com/report/github.com/go-playground/mold)
@@ -16,12 +16,12 @@ Installation
 
 Use go get.
 ```shell
-go get -u github.com/go-playground/mold/v3
+go get -u github.com/go-playground/mold/v4
 ```
 
 Then import the form package into your own code.
 
-	import "github.com/go-playground/mold/v3"
+	import "github.com/go-playground/mold/v4"
 
 Simple example
 -----
@@ -34,7 +34,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 )
 
 var tform *mold.Transformer
@@ -81,10 +81,8 @@ import (
 	"net/url"
 
 	"github.com/go-playground/form"
-
-	"github.com/go-playground/mold/v3/modifiers"
-	"github.com/go-playground/mold/v3/scrubbers"
-
+	"github.com/go-playground/mold/v4/modifiers"
+	"github.com/go-playground/mold/v4/scrubbers"
 	"gopkg.in/go-playground/validator.v9"
 )
 

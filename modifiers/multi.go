@@ -2,55 +2,58 @@ package modifiers
 
 import (
 	"context"
-	"reflect"
 	"strconv"
 	"time"
 
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 )
 
 //
 // Default allows setting of a default value IF no value is already present.
 //
-func Default(_ context.Context, _ *mold.Transformer, v reflect.Value, param string) error {
-	if !v.IsZero() {
+func Default(ctx context.Context, fl mold.FieldLevel) error {
+	if !fl.Field().IsZero() {
 		return nil
 	}
 
-	switch v.Interface().(type) {
+	switch fl.Field().Interface().(type) {
 	case string:
-		v.SetString(param)
+		fl.Field().SetString(fl.Param())
+
 	case int, int8, int16, int32, int64:
-		value, err := strconv.Atoi(param)
+		value, err := strconv.Atoi(fl.Param())
 		if err != nil {
 			return err
 		}
-		v.SetInt(int64(value))
+		fl.Field().SetInt(int64(value))
 
 	case uint, uint8, uint16, uint32, uint64:
-		value, err := strconv.Atoi(param)
+		value, err := strconv.Atoi(fl.Param())
 		if err != nil {
 			return err
 		}
-		v.SetUint(uint64(value))
+		fl.Field().SetUint(uint64(value))
+
 	case float32, float64:
-		value, err := strconv.ParseFloat(param, 64)
+		value, err := strconv.ParseFloat(fl.Param(), 64)
 		if err != nil {
 			return err
 		}
-		v.SetFloat(value)
+		fl.Field().SetFloat(value)
+
 	case bool:
-		value, err := strconv.ParseBool(param)
+		value, err := strconv.ParseBool(fl.Param())
 		if err != nil {
 			return err
 		}
-		v.SetBool(value)
+		fl.Field().SetBool(value)
+
 	case time.Duration:
-		d, err := time.ParseDuration(param)
+		d, err := time.ParseDuration(fl.Param())
 		if err != nil {
 			return err
 		}
-		v.SetInt(int64(d))
+		fl.Field().SetInt(int64(d))
 	}
 	return nil
 }

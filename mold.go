@@ -16,11 +16,17 @@ var (
 
 // TODO - ensure StructLevel and Func get passed an interface and not *Transform directly
 
+// Transform represents a subset of the current *Transformer that is executing the current transformation.
+type Transform interface {
+	Struct(ctx context.Context, v interface{}) error
+	Field(ctx context.Context, v interface{}, tags string) error
+}
+
 // Func defines a transform function for use.
-type Func func(ctx context.Context, t *Transformer, value reflect.Value, param string) error
+type Func func(ctx context.Context, fl FieldLevel) error
 
 // StructLevelFunc accepts all values needed for struct level validation
-type StructLevelFunc func(ctx context.Context, t *Transformer, value reflect.Value) error
+type StructLevelFunc func(ctx context.Context, sl StructLevel) error
 
 // Transformer is the base controlling object which contains
 // all necessary information
@@ -118,22 +124,22 @@ func (t *Transformer) RegisterStructLevel(fn StructLevelFunc, types ...interface
 
 // Struct applies transformations against the provided struct
 func (t *Transformer) Struct(ctx context.Context, v interface{}) error {
-	val := reflect.ValueOf(v)
+	orig := reflect.ValueOf(v)
 
-	if val.Kind() != reflect.Ptr || val.IsNil() {
+	if orig.Kind() != reflect.Ptr || orig.IsNil() {
 		return &ErrInvalidTransformValue{typ: reflect.TypeOf(v), fn: "Struct"}
 	}
 
-	val = val.Elem()
+	val := orig.Elem()
 	typ := val.Type()
 
 	if val.Kind() != reflect.Struct || val.Type() == timeType {
 		return &ErrInvalidTransformation{typ: reflect.TypeOf(v)}
 	}
-	return t.setByStruct(ctx, val, typ)
+	return t.setByStruct(ctx, orig, val, typ)
 }
 
-func (t *Transformer) setByStruct(ctx context.Context, current reflect.Value, typ reflect.Type) (err error) {
+func (t *Transformer) setByStruct(ctx context.Context, parent, current reflect.Value, typ reflect.Type) (err error) {
 	cs, ok := t.cCache.Get(typ)
 	if !ok {
 		if cs, err = t.extractStructCache(current); err != nil {
@@ -143,7 +149,11 @@ func (t *Transformer) setByStruct(ctx context.Context, current reflect.Value, ty
 
 	// run is struct has a corresponding struct level transformation
 	if cs.fn != nil {
-		if err = cs.fn(ctx, t, current); err != nil {
+		if err = cs.fn(ctx, structLevel{
+			transformer: t,
+			parent:      parent,
+			current:     current,
+		}); err != nil {
 			return
 		}
 	}
@@ -218,12 +228,22 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 				if !current.CanAddr() {
 					newVal := reflect.New(current.Type()).Elem()
 					newVal.Set(current)
-					if err = ct.fn(ctx, t, newVal, ct.param); err != nil {
+					if err = ct.fn(ctx, fieldLevel{
+						transformer: t,
+						parent:      orig,
+						current:     newVal,
+						param:       ct.param,
+					}); err != nil {
 						return
 					}
 					orig.Set(newVal)
 				} else {
-					if err = ct.fn(ctx, t, current, ct.param); err != nil {
+					if err = ct.fn(ctx, fieldLevel{
+						transformer: t,
+						parent:      orig,
+						current:     current,
+						param:       ct.param,
+					}); err != nil {
 						return
 					}
 				}
@@ -235,6 +255,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 	// need to do this again because one of the previous
 	// sets could have set a struct value, where it was a
 	// nil pointer before
+	orig2 := current
 	current, kind = extractType(current)
 
 	if kind == reflect.Struct {
@@ -247,13 +268,13 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 			newVal := reflect.New(typ).Elem()
 			newVal.Set(current)
 
-			if err = t.setByStruct(ctx, newVal, typ); err != nil {
+			if err = t.setByStruct(ctx, orig, newVal, typ); err != nil {
 				return
 			}
 			orig.Set(newVal)
 			return
 		}
-		err = t.setByStruct(ctx, current, typ)
+		err = t.setByStruct(ctx, orig2, current, typ)
 	}
 	return
 }

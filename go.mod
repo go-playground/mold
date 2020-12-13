@@ -1,4 +1,4 @@
-module github.com/go-playground/mold/v3
+module github.com/go-playground/mold/v4
 
 go 1.15
 
