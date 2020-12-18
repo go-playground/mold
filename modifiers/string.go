@@ -108,6 +108,8 @@ var namePatterns = []map[string]string{
 	{`( )*-( )*`: "-"}, // trim enclosing whitespaces around hyphen
 }
 
+var nameRegex = regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`)
+
 // NameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
 // converts multiple spaces and dashes to single characters, title cases multiple names.
 // Example: "3493€848Jo-$%£@Ann " -> "Jo-Ann", " ~~ The Dude ~~" -> "The Dude", "**susan**" -> "Susan",
@@ -117,13 +119,12 @@ func NameCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param s
 	if !ok {
 		return nil
 	}
-	first := onlyOne(strings.ToLower(s), namePatterns)
-	v.SetString(strings.Title(regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`).FindString(first)))
+	v.SetString(strings.Title(nameRegex.FindString(onlyOne(strings.ToLower(s)))))
 	return nil
 }
 
-func onlyOne(s string, m []map[string]string) string {
-	for _, v := range m {
+func onlyOne(s string) string {
+	for _, v := range namePatterns {
 		for f, r := range v {
 			s = regexp.MustCompile(f).ReplaceAllLiteralString(s, r)
 		}
