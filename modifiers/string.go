@@ -104,7 +104,6 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 var stripNumRegex = regexp.MustCompile("[^0-9]")
 
 // StripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
-// From https://github.com/leebenson/conform
 func StripAlphaCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
 	s, ok := v.Interface().(string)
 	if !ok {
@@ -117,7 +116,6 @@ func StripAlphaCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ s
 var stripAlphaRegex = regexp.MustCompile("[0-9]")
 
 // StripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
-// From https://github.com/leebenson/conform
 func StripNumCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
 	s, ok := v.Interface().(string)
 	if !ok {
@@ -127,29 +125,27 @@ func StripNumCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ str
 	return nil
 }
 
-var StripNumUnicodeRegex = regexp.MustCompile(`[^\pL]`)
+var stripNumUnicodeRegex = regexp.MustCompile(`[^\pL]`)
 
 // StripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
-// From https://github.com/leebenson/conform
 func StripNumUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
 	s, ok := v.Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(StripNumUnicodeRegex.ReplaceAllLiteralString(s, ""))
+	v.SetString(stripNumUnicodeRegex.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 
-var StripAlphaUnicode = regexp.MustCompile(`[\pL]`)
+var stripAlphaUnicode = regexp.MustCompile(`[\pL]`)
 
 // StripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
-// From https://github.com/leebenson/conform
 func StripAlphaUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
 	s, ok := v.Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(StripAlphaUnicode.ReplaceAllLiteralString(s, ""))
+	v.SetString(stripAlphaUnicode.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 
