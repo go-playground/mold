@@ -104,6 +104,38 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 	return nil
 }
 
+var namePatterns = []map[string]string{
+	{`[^\pL-\s']`: ""}, // cut off everything except [ alpha, hyphen, whitespace, apostrophe]
+	{`\s{2,}`: " "},    // trim more than two whitespaces to one
+	{`-{2,}`: "-"},     // trim more than two hyphens to one
+	{`'{2,}`: "'"},     // trim more than two apostrophes to one
+	{`( )*-( )*`: "-"}, // trim enclosing whitespaces around hyphen
+}
+
+var nameRegex = regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`)
+
+// NameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
+// converts multiple spaces and dashes to single characters, title cases multiple names.
+// Example: "3493€848Jo-$%£@Ann " -> "Jo-Ann", " ~~ The Dude ~~" -> "The Dude", "**susan**" -> "Susan",
+// " hugh fearnley-whittingstall" -> "Hugh Fearnley-Whittingstall"
+func NameCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(strings.Title(nameRegex.FindString(onlyOne(strings.ToLower(s)))))
+	return nil
+}
+
+func onlyOne(s string) string {
+	for _, v := range namePatterns {
+		for f, r := range v {
+			s = regexp.MustCompile(f).ReplaceAllLiteralString(s, r)
+		}
+	}
+	return s
+}
+
 // UppercaseFirstCharacterCase converts a string so that it has only the first capital letter. Example: "all lower" -> "All lower"
 func UppercaseFirstCharacterCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
 	s, ok := v.Interface().(string)
