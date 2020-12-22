@@ -289,13 +289,11 @@ func (t *Transformer) setByIterable(ctx context.Context, current reflect.Value, 
 }
 
 func (t *Transformer) setByMap(ctx context.Context, current reflect.Value, ct *cTag) error {
-	hasKeys := ct != nil && ct.typeof == typeKeys && ct.keys != nil
-
 	for _, key := range current.MapKeys() {
 		newVal := reflect.New(current.Type().Elem()).Elem()
 		newVal.Set(current.MapIndex(key))
 
-		if hasKeys {
+		if ct != nil && ct.typeof == typeKeys && ct.keys != nil {
 			// remove current map key as we may be changing it
 			// and re-add to the map afterwards
 			current.SetMapIndex(key, reflect.Value{})

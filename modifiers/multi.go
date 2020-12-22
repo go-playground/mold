@@ -9,9 +9,9 @@ import (
 )
 
 //
-// Default allows setting of a default value IF no value is already present.
+// defaultValue allows setting of a default value IF no value is already present.
 //
-func Default(ctx context.Context, fl mold.FieldLevel) error {
+func defaultValue(ctx context.Context, fl mold.FieldLevel) error {
 	if !fl.Field().IsZero() {
 		return nil
 	}

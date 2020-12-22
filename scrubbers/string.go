@@ -18,8 +18,8 @@ var (
 	}
 )
 
-// Emails scrubs all emails found for PII compliance
-func Emails(ctx context.Context, fl mold.FieldLevel) error {
+// emails scrubs all emails found for PII compliance
+func emails(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil

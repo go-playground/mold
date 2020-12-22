@@ -13,8 +13,8 @@ import (
 	"github.com/segmentio/go-snakecase"
 )
 
-// TrimSpace trims extra space from text
-func TrimSpace(ctx context.Context, fl mold.FieldLevel) error {
+// trimSpace trims extra space from text
+func trimSpace(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -23,8 +23,8 @@ func TrimSpace(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// TrimLeft trims extra left hand side of string using provided cutset
-func TrimLeft(ctx context.Context, fl mold.FieldLevel) error {
+// trimLeft trims extra left hand side of string using provided cutset
+func trimLeft(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -33,8 +33,8 @@ func TrimLeft(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// TrimRight trims extra right hand side of string using provided cutset
-func TrimRight(ctx context.Context, fl mold.FieldLevel) error {
+// trimRight trims extra right hand side of string using provided cutset
+func trimRight(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -43,8 +43,8 @@ func TrimRight(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// TrimPrefix trims the string of a prefix
-func TrimPrefix(ctx context.Context, fl mold.FieldLevel) error {
+// trimPrefix trims the string of a prefix
+func trimPrefix(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -53,8 +53,8 @@ func TrimPrefix(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// TrimSuffix trims the string of a suffix
-func TrimSuffix(ctx context.Context, fl mold.FieldLevel) error {
+// trimSuffix trims the string of a suffix
+func trimSuffix(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -63,8 +63,8 @@ func TrimSuffix(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// ToLower convert string to lower case
-func ToLower(ctx context.Context, fl mold.FieldLevel) error {
+// toLower convert string to lower case
+func toLower(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -73,8 +73,8 @@ func ToLower(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// ToUpper convert string to upper case
-func ToUpper(ctx context.Context, fl mold.FieldLevel) error {
+// toUpper convert string to upper case
+func toUpper(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -83,8 +83,8 @@ func ToUpper(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// SnakeCase converts string to snake case
-func SnakeCase(ctx context.Context, fl mold.FieldLevel) error {
+// snakeCase converts string to snake case
+func snakeCase(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -93,8 +93,8 @@ func SnakeCase(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// TitleCase converts string to title case, e.g. "this is a sentence" -> "This Is A Sentence"
-func TitleCase(ctx context.Context, fl mold.FieldLevel) error {
+// titleCase converts string to title case, e.g. "this is a sentence" -> "This Is A Sentence"
+func titleCase(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -113,11 +113,11 @@ var namePatterns = []map[string]string{
 
 var nameRegex = regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`)
 
-// NameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
+// nameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
 // converts multiple spaces and dashes to single characters, title cases multiple names.
 // Example: "3493€848Jo-$%£@Ann " -> "Jo-Ann", " ~~ The Dude ~~" -> "The Dude", "**susan**" -> "Susan",
 // " hugh fearnley-whittingstall" -> "Hugh Fearnley-Whittingstall"
-func NameCase(ctx context.Context, fl mold.FieldLevel) error {
+func nameCase(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -135,8 +135,8 @@ func onlyOne(s string) string {
 	return s
 }
 
-// UppercaseFirstCharacterCase converts a string so that it has only the first capital letter. Example: "all lower" -> "All lower"
-func UppercaseFirstCharacterCase(_ context.Context, fl mold.FieldLevel) error {
+// uppercaseFirstCharacterCase converts a string so that it has only the first capital letter. Example: "all lower" -> "All lower"
+func uppercaseFirstCharacterCase(_ context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -157,8 +157,8 @@ func UppercaseFirstCharacterCase(_ context.Context, fl mold.FieldLevel) error {
 
 var stripNumRegex = regexp.MustCompile("[^0-9]")
 
-// StripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
-func StripAlphaCase(_ context.Context, fl mold.FieldLevel) error {
+// stripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
+func stripAlphaCase(_ context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -169,8 +169,8 @@ func StripAlphaCase(_ context.Context, fl mold.FieldLevel) error {
 
 var stripAlphaRegex = regexp.MustCompile("[0-9]")
 
-// StripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
-func StripNumCase(_ context.Context, fl mold.FieldLevel) error {
+// stripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
+func stripNumCase(_ context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -181,8 +181,8 @@ func StripNumCase(_ context.Context, fl mold.FieldLevel) error {
 
 var stripNumUnicodeRegex = regexp.MustCompile(`[^\pL]`)
 
-// StripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
-func StripNumUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
+// stripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
+func stripNumUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -193,8 +193,8 @@ func StripNumUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
 
 var stripAlphaUnicode = regexp.MustCompile(`[\pL]`)
 
-// StripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
-func StripAlphaUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
+// stripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
+func stripAlphaUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
@@ -203,8 +203,8 @@ func StripAlphaUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
-// CamelCase converts string to camel case
-func CamelCase(ctx context.Context, fl mold.FieldLevel) error {
+// camelCase converts string to camel case
+func camelCase(ctx context.Context, fl mold.FieldLevel) error {
 	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil

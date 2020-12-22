@@ -8,7 +8,7 @@ import (
 func New() *mold.Transformer {
 	scrub := mold.New()
 	scrub.SetTagName("scrub")
-	scrub.Register("emails", Emails)
+	scrub.Register("emails", emails)
 	scrub.Register("text", textFn("text"))
 	scrub.Register("email", textFn("email"))
 	scrub.Register("name", textFn("name"))
