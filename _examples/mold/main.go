@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"reflect"
 
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 )
 
 var tform *mold.Transformer
@@ -35,7 +34,7 @@ func main() {
 	fmt.Println(myString)
 }
 
-func transformMyData(ctx context.Context, t *mold.Transformer, value reflect.Value, param string) error {
-	value.SetString("test")
+func transformMyData(ctx context.Context, fl mold.FieldLevel) error {
+	fl.Field().SetString("test")
 	return nil
 }

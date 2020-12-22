@@ -1,14 +1,14 @@
 package scrubbers
 
 import (
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 )
 
 // New returns a scrubber with defaults registered
 func New() *mold.Transformer {
 	scrub := mold.New()
 	scrub.SetTagName("scrub")
-	scrub.Register("emails", Emails)
+	scrub.Register("emails", emails)
 	scrub.Register("text", textFn("text"))
 	scrub.Register("email", textFn("email"))
 	scrub.Register("name", textFn("name"))

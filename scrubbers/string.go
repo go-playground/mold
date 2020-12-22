@@ -3,11 +3,10 @@ package scrubbers
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"regexp"
 	"strings"
 
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 )
 
 var (
@@ -19,26 +18,26 @@ var (
 	}
 )
 
-// Emails scrubs all emails found for PII compliance
-func Emails(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// emails scrubs all emails found for PII compliance
+func emails(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
 	scrubbed := emailRegex.ReplaceAllStringFunc(s, emailSubmatchFn)
-	v.SetString(scrubbed)
+	fl.Field().SetString(scrubbed)
 	return nil
 }
 
 var textFn = func(shaName string) mold.Func {
 	// Text scrubs the whole text for PII compliance
-	return func(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
-		s, ok := v.Interface().(string)
+	return func(ctx context.Context, fl mold.FieldLevel) error {
+		s, ok := fl.Field().Interface().(string)
 		if !ok {
 			return nil
 		}
 		scrubbed := fmt.Sprintf("<<scrubbed::%s::sha1::%s>>", shaName, hashString(s))
-		v.SetString(scrubbed)
+		fl.Field().SetString(scrubbed)
 		return nil
 	}
 }

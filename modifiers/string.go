@@ -3,104 +3,103 @@ package modifiers
 import (
 	"bytes"
 	"context"
-	"reflect"
 	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/go-playground/mold/v3"
+	"github.com/go-playground/mold/v4"
 	"github.com/segmentio/go-camelcase"
-	snakecase "github.com/segmentio/go-snakecase"
+	"github.com/segmentio/go-snakecase"
 )
 
-// TrimSpace trims extra space from text
-func TrimSpace(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// trimSpace trims extra space from text
+func trimSpace(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.TrimSpace(s))
+	fl.Field().SetString(strings.TrimSpace(s))
 	return nil
 }
 
-// TrimLeft trims extra left hand side of string using provided cutset
-func TrimLeft(_ context.Context, _ *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// trimLeft trims extra left hand side of string using provided cutset
+func trimLeft(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.TrimLeft(s, param))
+	fl.Field().SetString(strings.TrimLeft(s, fl.Param()))
 	return nil
 }
 
-// TrimRight trims extra right hand side of string using provided cutset
-func TrimRight(_ context.Context, _ *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// trimRight trims extra right hand side of string using provided cutset
+func trimRight(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.TrimRight(s, param))
+	fl.Field().SetString(strings.TrimRight(s, fl.Param()))
 	return nil
 }
 
-// TrimPrefix trims the string of a prefix
-func TrimPrefix(_ context.Context, _ *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// trimPrefix trims the string of a prefix
+func trimPrefix(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.TrimPrefix(s, param))
+	fl.Field().SetString(strings.TrimPrefix(s, fl.Param()))
 	return nil
 }
 
-// TrimSuffix trims the string of a suffix
-func TrimSuffix(_ context.Context, _ *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// trimSuffix trims the string of a suffix
+func trimSuffix(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.TrimSuffix(s, param))
+	fl.Field().SetString(strings.TrimSuffix(s, fl.Param()))
 	return nil
 }
 
-// ToLower convert string to lower case
-func ToLower(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// toLower convert string to lower case
+func toLower(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.ToLower(s))
+	fl.Field().SetString(strings.ToLower(s))
 	return nil
 }
 
-// ToUpper convert string to upper case
-func ToUpper(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// toUpper convert string to upper case
+func toUpper(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.ToUpper(s))
+	fl.Field().SetString(strings.ToUpper(s))
 	return nil
 }
 
-// SnakeCase converts string to snake case
-func SnakeCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// snakeCase converts string to snake case
+func snakeCase(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(snakecase.Snakecase(s))
+	fl.Field().SetString(snakecase.Snakecase(s))
 	return nil
 }
 
-// TitleCase converts string to title case, e.g. "this is a sentence" -> "This Is A Sentence"
-func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// titleCase converts string to title case, e.g. "this is a sentence" -> "This Is A Sentence"
+func titleCase(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.Title(s))
+	fl.Field().SetString(strings.Title(s))
 	return nil
 }
 
@@ -114,16 +113,16 @@ var namePatterns = []map[string]string{
 
 var nameRegex = regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`)
 
-// NameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
+// nameCase Trims, strips numbers and special characters (except dashes and spaces separating names),
 // converts multiple spaces and dashes to single characters, title cases multiple names.
 // Example: "3493€848Jo-$%£@Ann " -> "Jo-Ann", " ~~ The Dude ~~" -> "The Dude", "**susan**" -> "Susan",
 // " hugh fearnley-whittingstall" -> "Hugh Fearnley-Whittingstall"
-func NameCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+func nameCase(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(strings.Title(nameRegex.FindString(onlyOne(strings.ToLower(s)))))
+	fl.Field().SetString(strings.Title(nameRegex.FindString(onlyOne(strings.ToLower(s)))))
 	return nil
 }
 
@@ -136,9 +135,9 @@ func onlyOne(s string) string {
 	return s
 }
 
-// UppercaseFirstCharacterCase converts a string so that it has only the first capital letter. Example: "all lower" -> "All lower"
-func UppercaseFirstCharacterCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// uppercaseFirstCharacterCase converts a string so that it has only the first capital letter. Example: "all lower" -> "All lower"
+func uppercaseFirstCharacterCase(_ context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
@@ -152,64 +151,64 @@ func UppercaseFirstCharacterCase(_ context.Context, _ *mold.Transformer, v refle
 	buf := &bytes.Buffer{}
 	buf.WriteRune(unicode.ToUpper(toRune))
 	buf.WriteString(s[size:])
-	v.SetString(buf.String())
+	fl.Field().SetString(buf.String())
 	return nil
 }
 
 var stripNumRegex = regexp.MustCompile("[^0-9]")
 
-// StripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
-func StripAlphaCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// stripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
+func stripAlphaCase(_ context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(stripNumRegex.ReplaceAllLiteralString(s, ""))
+	fl.Field().SetString(stripNumRegex.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 
 var stripAlphaRegex = regexp.MustCompile("[0-9]")
 
-// StripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
-func StripNumCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
-	s, ok := v.Interface().(string)
+// stripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
+func stripNumCase(_ context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(stripAlphaRegex.ReplaceAllLiteralString(s, ""))
+	fl.Field().SetString(stripAlphaRegex.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 
 var stripNumUnicodeRegex = regexp.MustCompile(`[^\pL]`)
 
-// StripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
-func StripNumUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// stripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
+func stripNumUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(stripNumUnicodeRegex.ReplaceAllLiteralString(s, ""))
+	fl.Field().SetString(stripNumUnicodeRegex.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 
 var stripAlphaUnicode = regexp.MustCompile(`[\pL]`)
 
-// StripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
-func StripAlphaUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// stripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
+func stripAlphaUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(stripAlphaUnicode.ReplaceAllLiteralString(s, ""))
+	fl.Field().SetString(stripAlphaUnicode.ReplaceAllLiteralString(s, ""))
 	return nil
 }
 
-// CamelCase converts string to camel case
-func CamelCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
-	s, ok := v.Interface().(string)
+// camelCase converts string to camel case
+func camelCase(ctx context.Context, fl mold.FieldLevel) error {
+	s, ok := fl.Field().Interface().(string)
 	if !ok {
 		return nil
 	}
-	v.SetString(camelcase.Camelcase(s))
+	fl.Field().SetString(camelcase.Camelcase(s))
 	return nil
 }
