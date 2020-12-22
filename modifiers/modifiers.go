@@ -17,6 +17,10 @@ func New() *mold.Transformer {
 	mod.Register("ucase", ToUpper)
 	mod.Register("snake", SnakeCase)
 	mod.Register("title", TitleCase)
+	mod.Register("strip_alpha", StripAlphaCase)
+	mod.Register("strip_num", StripNumCase)
+	mod.Register("strip_num_unicode", StripNumUnicodeCase)
+	mod.Register("strip_alpha_unicode", StripAlphaUnicodeCase)
 	mod.Register("camel", CamelCase)
 	mod.Register("default", Default)
 	return mod

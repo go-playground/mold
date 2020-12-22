@@ -3,10 +3,10 @@ package modifiers
 import (
 	"context"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/go-playground/mold/v3"
-
 	"github.com/segmentio/go-camelcase"
 	snakecase "github.com/segmentio/go-snakecase"
 )
@@ -101,6 +101,54 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 	return nil
 }
 
+var stripNumRegex = regexp.MustCompile("[^0-9]")
+
+// StripAlphaCase removes all non-numeric characters. Example: "the price is €30,38" -> "3038". Note: The struct field will remain a string. No type conversion takes place.
+func StripAlphaCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(stripNumRegex.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
+var stripAlphaRegex = regexp.MustCompile("[0-9]")
+
+// StripNumCase removes all numbers. Example "39472349D34a34v69e8932747" -> "Dave". Note: The struct field will remain a string. No type conversion takes place.
+func StripNumCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(stripAlphaRegex.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
+var stripNumUnicodeRegex = regexp.MustCompile(`[^\pL]`)
+
+// StripNumUnicodeCase removes non-alpha unicode characters. Example: "!@£$%^&'()Hello 1234567890 World+[];\" -> "HelloWorld"
+func StripNumUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(stripNumUnicodeRegex.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
+var stripAlphaUnicode = regexp.MustCompile(`[\pL]`)
+
+// StripAlphaUnicodeCase removes alpha unicode characters. Example: "Everything's here but the letters!" -> "' !"
+func StripAlphaUnicodeCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	v.SetString(stripAlphaUnicode.ReplaceAllLiteralString(s, ""))
+	return nil
+}
+
 // CamelCase converts string to camel case
 func CamelCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
 	s, ok := v.Interface().(string)
@@ -110,8 +158,3 @@ func CamelCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 	v.SetString(camelcase.Camelcase(s))
 	return nil
 }
-
-// TODO: Add more
-// - Snake_Case - can be combined with lowercase
-// - CamelCase
-// - many more
