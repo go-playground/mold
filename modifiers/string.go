@@ -1,10 +1,13 @@
 package modifiers
 
 import (
+	"bytes"
 	"context"
 	"reflect"
 	"regexp"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/go-playground/mold/v3"
 	"github.com/segmentio/go-camelcase"
@@ -98,6 +101,26 @@ func TitleCase(ctx context.Context, t *mold.Transformer, v reflect.Value, param 
 		return nil
 	}
 	v.SetString(strings.Title(s))
+	return nil
+}
+
+// UppercaseFirstCharacterCase converts a string so that it has only the first capital letter. Example: "all lower" -> "All lower"
+func UppercaseFirstCharacterCase(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
+	s, ok := v.Interface().(string)
+	if !ok {
+		return nil
+	}
+	if s == "" {
+		return nil
+	}
+	toRune, size := utf8.DecodeRuneInString(s)
+	if !unicode.IsLower(toRune) {
+		return nil
+	}
+	buf := &bytes.Buffer{}
+	buf.WriteRune(unicode.ToUpper(toRune))
+	buf.WriteString(s[size:])
+	v.SetString(buf.String())
 	return nil
 }
 
