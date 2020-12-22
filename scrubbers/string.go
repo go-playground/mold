@@ -20,7 +20,7 @@ var (
 )
 
 // Emails scrubs all emails found for PII compliance
-func Emails(ctx context.Context, t *mold.Transformer, v reflect.Value, param string) error {
+func Emails(_ context.Context, _ *mold.Transformer, v reflect.Value, _ string) error {
 	s, ok := v.Interface().(string)
 	if !ok {
 		return nil
