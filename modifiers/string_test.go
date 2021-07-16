@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // NOTES:
@@ -16,6 +18,19 @@ import (
 // -- may be a good idea to change to output path to somewherelike /tmp
 // go test -coverprofile cover.out && go tool cover -html=cover.out -o cover.html
 //
+
+func TestEnumType(t *testing.T) {
+	assert := require.New(t)
+
+	type State string
+	const START State = "start"
+	state := State("START")
+
+	conform := New()
+	err := conform.Field(context.Background(), &state, "lcase")
+	assert.NoError(err)
+	assert.Equal(START, state)
+}
 
 func TestEmails(t *testing.T) {
 	conform := New()
@@ -599,7 +614,7 @@ func TestNumCase(t *testing.T) {
 	}
 
 	iface = s
-  
+
 	err = conform.Field(context.Background(), &iface, "strip_alpha")
 	if err != nil {
 		log.Fatal(err)
