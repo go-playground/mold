@@ -6,4 +6,4 @@ test:
 bench:
 	$(GOCMD) test -bench=. -benchmem ./...
 
-.PHONY: linters-install lint test bench
+.PHONY: test bench
