@@ -1,9 +1,12 @@
 GOCMD=GO111MODULE=on go
 
+lint:
+	golangci-lint run
+
 test:
 	$(GOCMD) test -cover -race ./...
 
 bench:
 	$(GOCMD) test -bench=. -benchmem ./...
 
-.PHONY: linters-install lint test bench
+.PHONY: test bench lint

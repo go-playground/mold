@@ -3,6 +3,7 @@ package scrubbers
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -20,24 +21,22 @@ var (
 
 // emails scrubs all emails found for PII compliance
 func emails(ctx context.Context, fl mold.FieldLevel) error {
-	s, ok := fl.Field().Interface().(string)
-	if !ok {
-		return nil
+	switch fl.Field().Kind() {
+	case reflect.String:
+		scrubbed := emailRegex.ReplaceAllStringFunc(fl.Field().String(), emailSubmatchFn)
+		fl.Field().SetString(scrubbed)
 	}
-	scrubbed := emailRegex.ReplaceAllStringFunc(s, emailSubmatchFn)
-	fl.Field().SetString(scrubbed)
 	return nil
 }
 
 var textFn = func(shaName string) mold.Func {
 	// Text scrubs the whole text for PII compliance
 	return func(ctx context.Context, fl mold.FieldLevel) error {
-		s, ok := fl.Field().Interface().(string)
-		if !ok {
-			return nil
+		switch fl.Field().Kind() {
+		case reflect.String:
+			scrubbed := fmt.Sprintf("<<scrubbed::%s::sha1::%s>>", shaName, hashString(fl.Field().String()))
+			fl.Field().SetString(scrubbed)
 		}
-		scrubbed := fmt.Sprintf("<<scrubbed::%s::sha1::%s>>", shaName, hashString(s))
-		fl.Field().SetString(scrubbed)
 		return nil
 	}
 }

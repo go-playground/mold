@@ -9,6 +9,12 @@ import (
 )
 
 func TestDefault(t *testing.T) {
+
+	type State int
+	const FINISHED State = 5
+
+	var state State
+
 	conform := New()
 
 	tests := []struct {
@@ -18,6 +24,12 @@ func TestDefault(t *testing.T) {
 		expected    interface{}
 		expectError bool
 	}{
+		{
+			name:     "default State (although enum default value should be the default in practice)",
+			field:    state,
+			tags:     "default=5",
+			expected: FINISHED,
+		},
 		{
 			name:     "default string",
 			field:    "",

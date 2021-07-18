@@ -25,8 +25,19 @@ type Transform interface {
 // Func defines a transform function for use.
 type Func func(ctx context.Context, fl FieldLevel) error
 
-// StructLevelFunc accepts all values needed for struct level validation
+//
+// StructLevelFunc accepts all values needed for struct level manipulation.
+//
+// Why does this exist? For structs for which you may not have access or rights to add tags too,
+// from other packages your using.
+//
 type StructLevelFunc func(ctx context.Context, sl StructLevel) error
+
+//
+// InterceptorFunc is a way to intercept custom types to redirect the functions to be applied to an inner typ/value.
+// eg. sql.NullString, the manipulation should be done on the inner string.
+//
+type InterceptorFunc func(current reflect.Value) (inner reflect.Value)
 
 // Transformer is the base controlling object which contains
 // all necessary information
@@ -35,6 +46,7 @@ type Transformer struct {
 	aliases          map[string]string
 	transformations  map[string]Func
 	structLevelFuncs map[reflect.Type]StructLevelFunc
+	interceptors     map[reflect.Type]InterceptorFunc
 	cCache           *structCache
 	tCache           *tagCache
 }
@@ -51,6 +63,7 @@ func New() *Transformer {
 		tagName:         "mold",
 		aliases:         make(map[string]string),
 		transformations: make(map[string]Func),
+		interceptors:    make(map[reflect.Type]InterceptorFunc),
 		cCache:          sc,
 		tCache:          tc,
 	}
@@ -119,6 +132,19 @@ func (t *Transformer) RegisterStructLevel(fn StructLevelFunc, types ...interface
 
 	for _, typ := range types {
 		t.structLevelFuncs[reflect.TypeOf(typ)] = fn
+	}
+}
+
+//
+// RegisterInterceptor registers a new interceptor functions agains one or more types.
+// This InterceptorFunc allows one to intercept the incoming to to redirect the application of modifications
+// to an inner type/value.
+//
+// eg. sql.NullString
+//
+func (t *Transformer) RegisterInterceptor(fn InterceptorFunc, types ...interface{}) {
+	for _, typ := range types {
+		t.interceptors[reflect.TypeOf(typ)] = fn
 	}
 }
 
@@ -204,7 +230,7 @@ func (t *Transformer) Field(ctx context.Context, v interface{}, tags string) (er
 }
 
 func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cTag) (err error) {
-	current, kind := extractType(orig)
+	current, kind := t.extractType(orig)
 
 	if ct != nil && ct.hasTag {
 		for ct != nil {
@@ -236,7 +262,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 					}); err != nil {
 						return
 					}
-					orig.Set(newVal)
+					orig.Set(reflect.Indirect(newVal))
 				} else {
 					if err = ct.fn(ctx, fieldLevel{
 						transformer: t,
@@ -256,7 +282,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 	// sets could have set a struct value, where it was a
 	// nil pointer before
 	orig2 := current
-	current, kind = extractType(current)
+	current, kind = t.extractType(current)
 
 	if kind == reflect.Struct {
 		typ := current.Type()
@@ -271,7 +297,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 			if err = t.setByStruct(ctx, orig, newVal, typ); err != nil {
 				return
 			}
-			orig.Set(newVal)
+			orig.Set(reflect.Indirect(newVal))
 			return
 		}
 		err = t.setByStruct(ctx, orig2, current, typ)

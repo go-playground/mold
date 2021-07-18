@@ -2,8 +2,13 @@ package modifiers
 
 import (
 	"context"
+	"database/sql"
 	"log"
+	"reflect"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 // NOTES:
@@ -16,6 +21,19 @@ import (
 // -- may be a good idea to change to output path to somewherelike /tmp
 // go test -coverprofile cover.out && go tool cover -html=cover.out -o cover.html
 //
+
+func TestEnumType(t *testing.T) {
+	assert := require.New(t)
+
+	type State string
+	const START State = "start"
+	state := State("START")
+
+	conform := New()
+	err := conform.Field(context.Background(), &state, "lcase")
+	assert.NoError(err)
+	assert.Equal(START, state)
+}
 
 func TestEmails(t *testing.T) {
 	conform := New()
@@ -599,7 +617,7 @@ func TestNumCase(t *testing.T) {
 	}
 
 	iface = s
-  
+
 	err = conform.Field(context.Background(), &iface, "strip_alpha")
 	if err != nil {
 		log.Fatal(err)
@@ -792,3 +810,85 @@ func TestCamelCase(t *testing.T) {
 		t.Fatalf("Unexpected value '%v'\n", iface)
 	}
 }
+
+func TestString(t *testing.T) {
+	assert := require.New(t)
+	conform := New()
+
+	conform.RegisterInterceptor(func(current reflect.Value) (inner reflect.Value) {
+		current.FieldByName("Valid").SetBool(true)
+		return current.FieldByName("String")
+	}, sql.NullString{})
+
+	tests := []struct {
+		name        string
+		field       interface{}
+		tags        string
+		expected    interface{}
+		expectError bool
+	}{
+		{
+			name:     "test Camel Case",
+			field:    "this_is_snakecase",
+			tags:     "camel",
+			expected: "thisIsSnakecase",
+		},
+		{
+			name: "test Camel Case struct",
+			field: struct {
+				String string `mod:"camel"`
+			}{String: "this_is_snakecase"},
+			tags: "camel",
+			expected: struct {
+				String string `mod:"camel"`
+			}{String: "thisIsSnakecase"},
+		},
+		{
+			name:     "sql.nullString lcase",
+			field:    sql.NullString{String: "UPPERCASE", Valid: true},
+			tags:     "lcase",
+			expected: sql.NullString{String: "uppercase", Valid: true},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			var err error
+
+			input := reflect.ValueOf(tc.field)
+			if !input.CanAddr() {
+				// create NEW addressable pointer to struct and assign the old unadressable one.
+				// sort fo like:
+				//
+				// var newStruct *oldstructdef
+				// *newStruct = *&oldStruct
+				//
+				newVal := reflect.New(input.Type())
+				newVal.Elem().Set(input)
+				tc.field = newVal.Interface()
+			}
+
+			if reflect.ValueOf(tc.field).Kind() == reflect.Struct && !excludedStructs[reflect.TypeOf(tc.field)] {
+				err = conform.Struct(context.Background(), &tc.field)
+			} else {
+				err = conform.Field(context.Background(), &tc.field, tc.tags)
+			}
+
+			if tc.expectError {
+				assert.Error(err)
+				return
+			}
+			assert.NoError(err)
+			assert.Equal(tc.expected, reflect.Indirect(reflect.ValueOf(tc.field)).Interface())
+		})
+	}
+}
+
+var (
+	excludedStructs = map[reflect.Type]bool{
+		reflect.TypeOf(time.Time{}):      true,
+		reflect.TypeOf(sql.NullString{}): true,
+	}
+)
