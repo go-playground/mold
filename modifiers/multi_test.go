@@ -11,7 +11,6 @@ import (
 func TestDefault(t *testing.T) {
 
 	type State int
-	const READY State = 0
 	const FINISHED State = 5
 
 	var state State
