@@ -765,6 +765,52 @@ func TestNotAlphaCase(t *testing.T) {
 	}
 }
 
+func TestPunctuation(t *testing.T) {
+	conform := New()
+
+	s := "# M5W-1E6!!!"
+	expected := " M5W1E6"
+
+	type Test struct {
+		String string `mod:"strip_punctuation"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "strip_punctuation")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "strip_punctuation")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "strip_punctuation")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
+
 func TestCamelCase(t *testing.T) {
 	conform := New()
 

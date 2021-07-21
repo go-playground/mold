@@ -191,6 +191,17 @@ func stripAlphaUnicodeCase(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
+var stripPunctuationRegex = regexp.MustCompile(`[[:punct:]]`)
+
+// stripPunctuation removes punctuation. Example: "# M5W-1E6!!!" -> " M5W1E6"
+func stripPunctuation(ctx context.Context, fl mold.FieldLevel) error {
+	switch fl.Field().Kind() {
+	case reflect.String:
+		fl.Field().SetString(stripPunctuationRegex.ReplaceAllLiteralString(fl.Field().String(), ""))
+	}
+	return nil
+}
+
 // camelCase converts string to camel case
 func camelCase(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
