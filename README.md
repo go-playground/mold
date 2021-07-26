@@ -49,6 +49,7 @@ These functions modify the data in-place.
 | strip_num | Strips all ascii numeric characters from the data. |
 | strip_alpha_unicode | Strips all unicode characters from the data. |
 | strip_num_unicode | Strips all unicode numeric characters from the data. |
+| strip_punctuation | Strips all ascii punctuation from the data. |
 
 
 

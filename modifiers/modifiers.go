@@ -23,6 +23,7 @@ func New() *mold.Transformer {
 	mod.Register("strip_num", stripNumCase)
 	mod.Register("strip_num_unicode", stripNumUnicodeCase)
 	mod.Register("strip_alpha_unicode", stripAlphaUnicodeCase)
+	mod.Register("strip_punctuation", stripPunctuation)
 	mod.Register("camel", camelCase)
 	mod.Register("default", defaultValue)
 	return mod
