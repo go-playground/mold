@@ -217,21 +217,21 @@ func subStr(ctx context.Context, fl mold.FieldLevel) error {
 	case reflect.String:
 		val := fl.Field().String()
 		params := strings.SplitN(fl.Param(), "-", 2)
-
-		startStr := "0"
-		endStr := params[0]
-		if len(params) == 2 {
-			startStr = params[0]
-			endStr = params[1]
+		if len(params) == 0 {
+			return nil
 		}
 
-		start, err := strconv.Atoi(startStr)
+		start, err := strconv.Atoi(params[0])
 		if err != nil {
 			return err
 		}
-		end, err := strconv.Atoi(endStr)
-		if err != nil {
-			return err
+
+		end := len(val)
+		if len(params) >= 2 {
+			end, err = strconv.Atoi(params[1])
+			if err != nil {
+				return err
+			}
 		}
 
 		if len(val) < start {

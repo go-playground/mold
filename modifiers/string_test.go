@@ -963,7 +963,7 @@ func TestSubStr(t *testing.T) {
 		expected string
 	}{
 		{
-			tag:      "substr=1",
+			tag:      "substr=0-1",
 			expected: "1",
 		},
 		{
@@ -972,6 +972,10 @@ func TestSubStr(t *testing.T) {
 		},
 		{
 			tag:      "substr=0-2",
+			expected: "12",
+		},
+		{
+			tag:      "substr=1-2",
 			expected: "12",
 		},
 		{
@@ -988,6 +992,10 @@ func TestSubStr(t *testing.T) {
 		},
 		{
 			tag:      "substr=2-5",
+			expected: "3",
+		},
+		{
+			tag:      "substr=2",
 			expected: "3",
 		},
 	}
