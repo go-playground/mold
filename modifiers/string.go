@@ -217,7 +217,7 @@ func subStr(ctx context.Context, fl mold.FieldLevel) error {
 	case reflect.String:
 		val := fl.Field().String()
 		params := strings.SplitN(fl.Param(), "-", 2)
-		if len(params) == 0 {
+		if len(params) == 0 || len(params[0]) == 0 {
 			return nil
 		}
 

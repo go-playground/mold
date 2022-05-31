@@ -963,6 +963,10 @@ func TestSubStr(t *testing.T) {
 		expected string
 	}{
 		{
+			tag:      "substr",
+			expected: "",
+		},
+		{
 			tag:      "substr=0-1",
 			expected: "1",
 		},
