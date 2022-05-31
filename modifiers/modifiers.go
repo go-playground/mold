@@ -26,5 +26,6 @@ func New() *mold.Transformer {
 	mod.Register("strip_punctuation", stripPunctuation)
 	mod.Register("camel", camelCase)
 	mod.Register("default", defaultValue)
+	mod.Register("substr", subStr)
 	return mod
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -207,6 +208,45 @@ func camelCase(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
 	case reflect.String:
 		fl.Field().SetString(camelcase.Camelcase(fl.Field().String()))
+	}
+	return nil
+}
+
+func subStr(ctx context.Context, fl mold.FieldLevel) error {
+	switch fl.Field().Kind() {
+	case reflect.String:
+		val := fl.Field().String()
+		params := strings.SplitN(fl.Param(), "-", 2)
+
+		startStr := "0"
+		endStr := params[0]
+		if len(params) == 2 {
+			startStr = params[0]
+			endStr = params[1]
+		}
+
+		start, err := strconv.Atoi(startStr)
+		if err != nil {
+			return err
+		}
+		end, err := strconv.Atoi(endStr)
+		if err != nil {
+			return err
+		}
+
+		if len(val) < start {
+			fl.Field().SetString("")
+			return nil
+		}
+		if len(val) < end {
+			end = len(val)
+		}
+		if start > end {
+			fl.Field().SetString("")
+			return nil
+		}
+
+		fl.Field().SetString(val[start:end])
 	}
 	return nil
 }
