@@ -958,13 +958,24 @@ func TestSubStr(t *testing.T) {
 		t.Fatalf("Unexpected value '%s'\n", tt.String)
 	}
 
+	tag := "substr=f-3"
+	err = conform.Field(context.Background(), &s, tag)
+	if err == nil {
+		t.Fatalf("Unexpected value '%s' instead of error for tag %s\n", s, tag)
+	}
+	tag = "substr=2-f"
+	err = conform.Field(context.Background(), &s, tag)
+	if err == nil {
+		t.Fatalf("Unexpected value '%s' instead of error for tag %s\n", s, tag)
+	}
+
 	tests := []struct {
 		tag      string
 		expected string
 	}{
 		{
 			tag:      "substr",
-			expected: "",
+			expected: "123",
 		},
 		{
 			tag:      "substr=0-1",
