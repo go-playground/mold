@@ -976,7 +976,7 @@ func TestSubStr(t *testing.T) {
 		},
 		{
 			tag:      "substr=1-2",
-			expected: "12",
+			expected: "2",
 		},
 		{
 			tag:      "substr=3-3",
@@ -1007,7 +1007,7 @@ func TestSubStr(t *testing.T) {
 			log.Fatal(err)
 		}
 		if st != test.expected {
-			t.Fatalf("Unexpected value '%s'\n", st)
+			t.Fatalf("Unexpected value '%s' for tag %s\n", st, test.tag)
 		}
 
 		var iface interface{}
