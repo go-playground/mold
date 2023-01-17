@@ -12,6 +12,9 @@ import (
 	"github.com/go-playground/mold/v4"
 	"github.com/segmentio/go-camelcase"
 	"github.com/segmentio/go-snakecase"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // trimSpace trims extra space from text
@@ -90,7 +93,8 @@ func snakeCase(ctx context.Context, fl mold.FieldLevel) error {
 func titleCase(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
 	case reflect.String:
-		fl.Field().SetString(strings.Title(fl.Field().String()))
+		title := cases.Title(language.Und).String(fl.Field().String())
+		fl.Field().SetString(title)
 	}
 	return nil
 }
@@ -112,7 +116,10 @@ var nameRegex = regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`)
 func nameCase(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
 	case reflect.String:
-		fl.Field().SetString(strings.Title(nameRegex.FindString(onlyOne(strings.ToLower(fl.Field().String())))))
+		title := cases.Title(language.Und).String(
+			nameRegex.FindString(onlyOne(strings.ToLower(fl.Field().String()))),
+		)
+		fl.Field().SetString(title)
 	}
 	return nil
 }

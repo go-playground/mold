@@ -7,4 +7,5 @@ require (
 	github.com/segmentio/go-camelcase v0.0.0-20160726192923-7085f1e3c734
 	github.com/segmentio/go-snakecase v1.2.0
 	github.com/stretchr/testify v1.7.0
+	golang.org/x/text v0.6.0
 )
