@@ -112,3 +112,78 @@ func TestDefault(t *testing.T) {
 		})
 	}
 }
+
+func TestEmpty(t *testing.T) {
+
+	type State int
+	const FINISHED State = 5
+
+	var state State
+
+	conform := New()
+
+	tests := []struct {
+		name        string
+		field       interface{}
+		tags        string
+		expected    interface{}
+		expectError bool
+	}{
+		{
+			name:     "empty enum",
+			field:    FINISHED,
+			tags:     "empty",
+			expected: state,
+		},
+		{
+			name:     "empty string",
+			field:    "test",
+			tags:     "empty",
+			expected: "",
+		},
+		{
+			name:     "empty int",
+			field:    10,
+			tags:     "empty",
+			expected: 0,
+		},
+		{
+			name:     "empty uint",
+			field:    uint(10),
+			tags:     "empty",
+			expected: uint(0),
+		},
+		{
+			name:     "empty float",
+			field:    float32(10),
+			tags:     "empty",
+			expected: float32(0),
+		},
+		{
+			name:     "empty bool",
+			field:    true,
+			tags:     "empty",
+			expected: false,
+		},
+		{
+			name:     "empty time.Duration",
+			field:    time.Duration(10),
+			tags:     "empty",
+			expected: time.Duration(0),
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			err := conform.Field(context.Background(), &tc.field, tc.tags)
+			if tc.expectError {
+				NotEqual(t, err, nil)
+				return
+			}
+			Equal(t, err, nil)
+			Equal(t, tc.field, tc.expected)
+		})
+	}
+}

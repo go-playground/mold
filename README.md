@@ -33,23 +33,24 @@ These functions modify the data in-place.
 
 | Name  | Description  |
 |-------|--------------|
+| camel | Camel Cases the data. |
 | default | Sets the provided default value only if the data is equal to it's default datatype value. |
-| trim | Trims space from the data. |
+| empty | Sets the field equal to the datatype default value. e.g. 0 for int. |
+| lcase | lowercases the data. |
 | ltrim | Trims spaces from the left of the data provided in the params. |
 | rtrim | Trims spaces from the right of the data provided in the params. |
-| tprefix | Trims a prefix from the value using the provided param value. |
-| tsuffix | Trims a suffix from the value using the provided param value. |
-| lcase | lowercases the data. |
-| ucase | Uppercases the data. |
 | snake | Snake Cases the data. |
-| camel | Camel Cases the data. |
-| title | Title Cases the data. |
-| ucfirst | Upper cases the first character of the data. |
 | strip_alpha | Strips all ascii characters from the data. |
-| strip_num | Strips all ascii numeric characters from the data. |
 | strip_alpha_unicode | Strips all unicode characters from the data. |
+| strip_num | Strips all ascii numeric characters from the data. |
 | strip_num_unicode | Strips all unicode numeric characters from the data. |
 | strip_punctuation | Strips all ascii punctuation from the data. |
+| title | Title Cases the data. |
+| tprefix | Trims a prefix from the value using the provided param value. |
+| trim | Trims space from the data. |
+| tsuffix | Trims a suffix from the value using the provided param value. |
+| ucase | Uppercases the data. |
+| ucfirst | Upper cases the first character of the data. |
 
 
 
