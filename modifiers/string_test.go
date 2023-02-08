@@ -22,6 +22,16 @@ import (
 // go test -coverprofile cover.out && go tool cover -html=cover.out -o cover.html
 //
 
+func TestMultiple(t *testing.T) {
+	assert := require.New(t)
+	conform := New()
+	s := interface{}("JOEYBLOGGS ")
+
+	err := conform.Field(context.Background(), &s, "trim,lcase")
+	assert.NoError(err)
+	assert.Equal("joeybloggs", s)
+}
+
 func TestEnumType(t *testing.T) {
 	assert := require.New(t)
 
