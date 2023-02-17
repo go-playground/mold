@@ -1,6 +1,6 @@
 Package mold
 ============
-![Project status](https://img.shields.io/badge/version-4.2.0-green.svg)
+![Project status](https://img.shields.io/badge/version-4.2.1-green.svg)
 [![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=v2)](https://travis-ci.org/go-playground/mold)
 [![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=v2)](https://coveralls.io/github/go-playground/mold?branch=v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/mold)](https://goreportcard.com/report/github.com/go-playground/mold)
@@ -10,6 +10,10 @@ Package mold
 Package mold is a general library to help modify or set data within data structures and other objects.
 
 How can this help me you ask, please see the examples [here](_examples/full/main.go)
+
+Requirements
+------------
+- Go 1.18+
 
 Installation
 ------------
