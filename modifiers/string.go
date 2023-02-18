@@ -3,13 +3,14 @@ package modifiers
 import (
 	"bytes"
 	"context"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"reflect"
 	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/go-playground/mold/v4"
 	"github.com/segmentio/go-camelcase"
