@@ -14,6 +14,7 @@ func New() *mold.Transformer {
 	mod.Register("ltrim", trimLeft)
 	mod.Register("name", nameCase)
 	mod.Register("rtrim", trimRight)
+	mod.Register("set", setValue)
 	mod.Register("snake", snakeCase)
 	mod.Register("strip_alpha_unicode", stripAlphaUnicodeCase)
 	mod.Register("strip_alpha", stripAlphaCase)
