@@ -37,6 +37,12 @@ func TestSet(t *testing.T) {
 			expected: "test",
 		},
 		{
+			name:     "set string",
+			field:    "existing_value",
+			tags:     "set=test",
+			expected: "test",
+		},
+		{
 			name:     "set int",
 			field:    0,
 			tags:     "set=3",
@@ -140,6 +146,12 @@ func TestDefault(t *testing.T) {
 			field:    "",
 			tags:     "default=test",
 			expected: "test",
+		},
+		{
+			name:     "default string",
+			field:    "existing_value",
+			tags:     "default=test",
+			expected: "existing_value",
 		},
 		{
 			name:     "default int",

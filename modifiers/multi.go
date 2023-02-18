@@ -23,10 +23,6 @@ func defaultValue(ctx context.Context, fl mold.FieldLevel) error {
 
 // setValue allows setting of a specified value
 func setValue(ctx context.Context, fl mold.FieldLevel) error {
-	if !fl.Field().IsZero() {
-		return nil
-	}
-
 	switch fl.Field().Kind() {
 	case reflect.String:
 		fl.Field().SetString(fl.Param())
