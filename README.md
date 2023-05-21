@@ -44,6 +44,7 @@ These functions modify the data in-place.
 | ltrim               | Trims spaces from the left of the data provided in the params.                            |
 | rtrim               | Trims spaces from the right of the data provided in the params.                           |
 | set                 | Set the provided value.                                                                   |
+| slug                | Converts the field to a [slug](https://github.com/gosimple/slug)                          |
 | snake               | Snake Cases the data.                                                                     |
 | strip_alpha         | Strips all ascii characters from the data.                                                |
 | strip_alpha_unicode | Strips all unicode characters from the data.                                              |
