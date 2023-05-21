@@ -994,3 +994,109 @@ var (
 		reflect.TypeOf(sql.NullString{}): true,
 	}
 )
+
+func TestSubStr(t *testing.T) {
+	conform := New()
+
+	s := "123"
+	expected := "123"
+
+	type Test struct {
+		String string `mod:"substr=0-3"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	tag := "substr=f-3"
+	err = conform.Field(context.Background(), &s, tag)
+	if err == nil {
+		t.Fatalf("Unexpected value '%s' instead of error for tag %s\n", s, tag)
+	}
+	tag = "substr=2-f"
+	err = conform.Field(context.Background(), &s, tag)
+	if err == nil {
+		t.Fatalf("Unexpected value '%s' instead of error for tag %s\n", s, tag)
+	}
+
+	tests := []struct {
+		tag      string
+		expected string
+	}{
+		{
+			tag:      "substr",
+			expected: "123",
+		},
+		{
+			tag:      "substr=0-1",
+			expected: "1",
+		},
+		{
+			tag:      "substr=0-3",
+			expected: "123",
+		},
+		{
+			tag:      "substr=0-2",
+			expected: "12",
+		},
+		{
+			tag:      "substr=1-2",
+			expected: "2",
+		},
+		{
+			tag:      "substr=3-3",
+			expected: "",
+		},
+		{
+			tag:      "substr=4-5",
+			expected: "",
+		},
+		{
+			tag:      "substr=2-1",
+			expected: "",
+		},
+		{
+			tag:      "substr=2-5",
+			expected: "3",
+		},
+		{
+			tag:      "substr=2",
+			expected: "3",
+		},
+	}
+	for _, test := range tests {
+		st := s
+
+		err = conform.Field(context.Background(), &st, test.tag)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if st != test.expected {
+			t.Fatalf("Unexpected value '%s' for tag %s\n", st, test.tag)
+		}
+
+		var iface interface{}
+		err = conform.Field(context.Background(), &iface, test.tag)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if iface != nil {
+			t.Fatalf("Unexpected value '%v'\n", nil)
+		}
+
+		iface = s
+		err = conform.Field(context.Background(), &iface, test.tag)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if iface != test.expected {
+			t.Fatalf("Unexpected value '%v'\n", iface)
+		}
+	}
+}
