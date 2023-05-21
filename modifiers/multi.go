@@ -13,14 +13,16 @@ var (
 	durationType = reflect.TypeOf(time.Duration(0))
 )
 
-//
 // defaultValue allows setting of a default value IF no value is already present.
-//
 func defaultValue(ctx context.Context, fl mold.FieldLevel) error {
 	if !fl.Field().IsZero() {
 		return nil
 	}
+	return setValue(ctx, fl)
+}
 
+// setValue allows setting of a specified value
+func setValue(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
 	case reflect.String:
 		fl.Field().SetString(fl.Param())
@@ -72,5 +74,12 @@ func defaultValue(ctx context.Context, fl mold.FieldLevel) error {
 		fl.Field().SetBool(value)
 
 	}
+	return nil
+}
+
+// empty sets the field to the zero value of the field type
+func empty(ctx context.Context, fl mold.FieldLevel) error {
+	zeroValue := reflect.Zero(fl.Field().Type())
+	fl.Field().Set(zeroValue)
 	return nil
 }

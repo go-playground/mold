@@ -22,6 +22,16 @@ import (
 // go test -coverprofile cover.out && go tool cover -html=cover.out -o cover.html
 //
 
+func TestMultiple(t *testing.T) {
+	assert := require.New(t)
+	conform := New()
+	s := interface{}("JOEYBLOGGS ")
+
+	err := conform.Field(context.Background(), &s, "trim,lcase")
+	assert.NoError(err)
+	assert.Equal("joeybloggs", s)
+}
+
 func TestEnumType(t *testing.T) {
 	assert := require.New(t)
 
@@ -440,6 +450,52 @@ func TestTitleCase(t *testing.T) {
 
 	iface = s
 	err = conform.Field(context.Background(), &iface, "title")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != expected {
+		t.Fatalf("Unexpected value '%v'\n", iface)
+	}
+}
+
+func TestSlugCase(t *testing.T) {
+	conform := New()
+
+	s := "this-is +a SentencE9"
+	expected := "this-is-a-sentence9"
+
+	type Test struct {
+		String string `mod:"slug"`
+	}
+
+	tt := Test{String: s}
+	err := conform.Struct(context.Background(), &tt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if tt.String != expected {
+		t.Fatalf("Unexpected value '%s'\n", tt.String)
+	}
+
+	err = conform.Field(context.Background(), &s, "slug")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s != expected {
+		t.Fatalf("Unexpected value '%s'\n", s)
+	}
+
+	var iface interface{}
+	err = conform.Field(context.Background(), &iface, "slug")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if iface != nil {
+		t.Fatalf("Unexpected value '%v'\n", nil)
+	}
+
+	iface = s
+	err = conform.Field(context.Background(), &iface, "slug")
 	if err != nil {
 		log.Fatal(err)
 	}

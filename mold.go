@@ -25,18 +25,14 @@ type Transform interface {
 // Func defines a transform function for use.
 type Func func(ctx context.Context, fl FieldLevel) error
 
-//
 // StructLevelFunc accepts all values needed for struct level manipulation.
 //
 // Why does this exist? For structs for which you may not have access or rights to add tags too,
 // from other packages your using.
-//
 type StructLevelFunc func(ctx context.Context, sl StructLevel) error
 
-//
 // InterceptorFunc is a way to intercept custom types to redirect the functions to be applied to an inner typ/value.
 // eg. sql.NullString, the manipulation should be done on the inner string.
-//
 type InterceptorFunc func(current reflect.Value) (inner reflect.Value)
 
 // Transformer is the base controlling object which contains
@@ -135,13 +131,11 @@ func (t *Transformer) RegisterStructLevel(fn StructLevelFunc, types ...interface
 	}
 }
 
-//
 // RegisterInterceptor registers a new interceptor functions agains one or more types.
 // This InterceptorFunc allows one to intercept the incoming to to redirect the application of modifications
 // to an inner type/value.
 //
 // eg. sql.NullString
-//
 func (t *Transformer) RegisterInterceptor(fn InterceptorFunc, types ...interface{}) {
 	for _, typ := range types {
 		t.interceptors[reflect.TypeOf(typ)] = fn
@@ -263,6 +257,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 						return
 					}
 					orig.Set(reflect.Indirect(newVal))
+					current, kind = t.extractType(orig)
 				} else {
 					if err = ct.fn(ctx, fieldLevel{
 						transformer: t,

@@ -10,7 +10,11 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/go-playground/mold/v4"
+	"github.com/gosimple/slug"
 	"github.com/segmentio/go-camelcase"
 	"github.com/segmentio/go-snakecase"
 )
@@ -87,11 +91,20 @@ func snakeCase(ctx context.Context, fl mold.FieldLevel) error {
 	return nil
 }
 
+// slug converts string to a slug
+func slugCase(ctx context.Context, fl mold.FieldLevel) error {
+	switch fl.Field().Kind() {
+	case reflect.String:
+		fl.Field().SetString(slug.Make(fl.Field().String()))
+	}
+	return nil
+}
+
 // titleCase converts string to title case, e.g. "this is a sentence" -> "This Is A Sentence"
 func titleCase(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
 	case reflect.String:
-		fl.Field().SetString(strings.Title(fl.Field().String()))
+		fl.Field().SetString(cases.Title(language.Und, cases.NoLower).String(fl.Field().String()))
 	}
 	return nil
 }
@@ -113,7 +126,7 @@ var nameRegex = regexp.MustCompile(`[\p{L}]([\p{L}|[:space:]\-']*[\p{L}])*`)
 func nameCase(ctx context.Context, fl mold.FieldLevel) error {
 	switch fl.Field().Kind() {
 	case reflect.String:
-		fl.Field().SetString(strings.Title(nameRegex.FindString(onlyOne(strings.ToLower(fl.Field().String())))))
+		fl.Field().SetString(cases.Title(language.Und, cases.NoLower).String(nameRegex.FindString(onlyOne(strings.ToLower(fl.Field().String())))))
 	}
 	return nil
 }
