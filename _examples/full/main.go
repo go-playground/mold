@@ -64,7 +64,7 @@ func main() {
 	}
 	fmt.Printf("Decoded:%+v\n\n", user)
 
-	// great not lets conform our values, after all a human input the data
+	// great now lets conform our values, after all a human input the data
 	// nobody's perfect
 	err = conform.Struct(context.Background(), &user)
 	if err != nil {
