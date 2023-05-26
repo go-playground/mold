@@ -678,3 +678,71 @@ func TestStructArray(t *testing.T) {
 	Equal(t, len(tt5.ArrNoTag), 1)
 	Equal(t, tt5.ArrNoTag[0].String, "")
 }
+
+func TestStructPtrArray(t *testing.T) {
+	type InnerStruct struct {
+		String string `s:"defaultStr"`
+	}
+
+	type Test struct {
+		Inner                *InnerStruct
+		ArrSetDefault        *[]InnerStruct `s:"defaultArr"`
+		ArrSetDefaultAndDive *[]InnerStruct `s:"defaultArr,dive"`
+		ArrDive              *[]InnerStruct `s:"dive"`
+		ArrNoTag             *[]InnerStruct
+	}
+
+	set := New()
+	set.SetTagName("s")
+	set.Register("defaultArr", func(ctx context.Context, fl FieldLevel) error {
+		if HasValue(fl.Field()) {
+			return nil
+		}
+		arr := make([]InnerStruct, 2)
+		fl.Field().Set(reflect.ValueOf(&arr))
+		return nil
+	})
+	set.Register("defaultStr", func(ctx context.Context, fl FieldLevel) error {
+		if fl.Field().String() == "ok" {
+			return errors.New("ALREADY OK")
+		}
+		fl.Field().SetString("default")
+		return nil
+	})
+
+	tt1 := Test{
+		Inner:                &InnerStruct{},
+		ArrSetDefault:        &[]InnerStruct{{}},
+		ArrSetDefaultAndDive: &[]InnerStruct{{}},
+		ArrDive:              &[]InnerStruct{{}},
+		ArrNoTag:             &[]InnerStruct{{}},
+	}
+
+	err := set.Struct(context.Background(), &tt1)
+	Equal(t, err, nil)
+	Equal(t, len(*tt1.ArrSetDefault), 1)
+	Equal(t, (*tt1.ArrSetDefault)[0].String, "")
+	Equal(t, len(*tt1.ArrSetDefaultAndDive), 1)
+	Equal(t, (*tt1.ArrSetDefaultAndDive)[0].String, "default")
+	Equal(t, len(*tt1.ArrDive), 1)
+	Equal(t, (*tt1.ArrDive)[0].String, "default")
+	Equal(t, len(*tt1.ArrNoTag), 1)
+	Equal(t, (*tt1.ArrNoTag)[0].String, "")
+
+	Equal(t, tt1.Inner.String, "default")
+
+	tt2 := Test{}
+
+	err = set.Struct(context.Background(), &tt2)
+	Equal(t, err, nil)
+	Equal(t, len(*tt2.ArrSetDefault), 2)
+	Equal(t, (*tt2.ArrSetDefault)[0].String, "")
+	Equal(t, (*tt2.ArrSetDefault)[1].String, "")
+	Equal(t, len(*tt2.ArrSetDefaultAndDive), 2)
+	Equal(t, (*tt2.ArrSetDefaultAndDive)[0].String, "default")
+	Equal(t, (*tt2.ArrSetDefaultAndDive)[1].String, "default")
+	Equal(t, tt2.ArrDive, nil)
+	Equal(t, tt2.ArrNoTag, nil)
+
+	Equal(t, tt2.Inner, nil)
+}

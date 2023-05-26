@@ -234,6 +234,10 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 			case typeDive:
 				ct = ct.next
 
+				if kind == reflect.Ptr && current.IsNil() {
+					return
+				}
+
 				switch kind {
 				case reflect.Slice, reflect.Array:
 					err = t.setByIterable(ctx, current, ct)
@@ -257,7 +261,6 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 						return
 					}
 					orig.Set(reflect.Indirect(newVal))
-					current, kind = t.extractType(orig)
 				} else {
 					if err = ct.fn(ctx, fieldLevel{
 						transformer: t,
@@ -268,6 +271,8 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 						return
 					}
 				}
+				current, kind = t.extractType(orig)
+
 				ct = ct.next
 			}
 		}
