@@ -239,6 +239,14 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 					err = t.setByIterable(ctx, current, ct)
 				case reflect.Map:
 					err = t.setByMap(ctx, current, ct)
+				case reflect.Ptr:
+					innerKind := current.Type().Elem().Kind()
+					if innerKind == reflect.Slice || innerKind == reflect.Map {
+						// is a nil pointer to a slice or map, nothing to do.
+						return nil
+					}
+					// not a valid use of the dive tag
+					fallthrough
 				default:
 					err = ErrInvalidDive
 				}
