@@ -267,6 +267,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 					}); err != nil {
 						return
 					}
+					current, kind = t.extractType(current)
 				}
 				ct = ct.next
 			}
