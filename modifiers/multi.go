@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-playground/mold/v4"
@@ -11,6 +12,7 @@ import (
 
 var (
 	durationType = reflect.TypeOf(time.Duration(0))
+	timeType     = reflect.TypeOf(time.Time{})
 )
 
 // defaultValue allows setting of a default value IF no value is already present.
@@ -73,6 +75,57 @@ func setValue(ctx context.Context, fl mold.FieldLevel) error {
 		}
 		fl.Field().SetBool(value)
 
+	case reflect.Map:
+		var n int
+		var err error
+		if fl.Param() != "" {
+			n, err = strconv.Atoi(fl.Param())
+			if err != nil {
+				return err
+			}
+		}
+		fl.Field().Set(reflect.MakeMapWithSize(fl.Field().Type(), n))
+
+	case reflect.Slice:
+		var cap int
+		var err error
+		if fl.Param() != "" {
+			cap, err = strconv.Atoi(fl.Param())
+			if err != nil {
+				return err
+			}
+		}
+		fl.Field().Set(reflect.MakeSlice(fl.Field().Type(), 0, cap))
+
+	case reflect.Struct:
+		if fl.Field().Type() == timeType {
+			if fl.Param() != "" {
+				if strings.ToLower(fl.Param()) == "utc" {
+					fl.Field().Set(reflect.ValueOf(time.Now().UTC()))
+				} else {
+					t, err := time.Parse(time.RFC3339Nano, fl.Param())
+					if err != nil {
+						return err
+					}
+					fl.Field().Set(reflect.ValueOf(t))
+				}
+			} else {
+				fl.Field().Set(reflect.ValueOf(time.Now()))
+			}
+		}
+	case reflect.Chan:
+		var buffer int
+		var err error
+		if fl.Param() != "" {
+			buffer, err = strconv.Atoi(fl.Param())
+			if err != nil {
+				return err
+			}
+		}
+		fl.Field().Set(reflect.MakeChan(fl.Field().Type(), buffer))
+
+	case reflect.Ptr:
+		fl.Field().Set(reflect.New(fl.Field().Type().Elem()))
 	}
 	return nil
 }

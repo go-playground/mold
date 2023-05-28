@@ -8,6 +8,202 @@ import (
 	. "github.com/go-playground/assert/v2"
 )
 
+func TestDefaultSetSpecialTypes(t *testing.T) {
+	conform := New()
+
+	tests := []struct {
+		name        string
+		field       interface{}
+		tags        string
+		vf          func(field interface{})
+		expectError bool
+	}{
+		{
+			name:  "default map",
+			field: (map[string]struct{})(nil),
+			tags:  "default",
+			vf: func(field interface{}) {
+				m := field.(map[string]struct{})
+				Equal(t, len(m), 0)
+			},
+		},
+		{
+			name:  "default map with size",
+			field: (map[string]struct{})(nil),
+			tags:  "default=5",
+			vf: func(field interface{}) {
+				m := field.(map[string]struct{})
+				Equal(t, len(m), 0)
+			},
+		},
+		{
+			name:  "set map with size",
+			field: (map[string]struct{})(nil),
+			tags:  "set=5",
+			vf: func(field interface{}) {
+				m := field.(map[string]struct{})
+				Equal(t, len(m), 0)
+			},
+		},
+		{
+			name:  "default slice",
+			field: ([]string)(nil),
+			tags:  "default",
+			vf: func(field interface{}) {
+				m := field.([]string)
+				Equal(t, len(m), 0)
+				Equal(t, cap(m), 0)
+			},
+		},
+		{
+			name:  "default slice with capacity",
+			field: ([]string)(nil),
+			tags:  "default=5",
+			vf: func(field interface{}) {
+				m := field.([]string)
+				Equal(t, len(m), 0)
+				Equal(t, cap(m), 5)
+			},
+		},
+		{
+			name:  "set slice",
+			field: ([]string)(nil),
+			tags:  "set",
+			vf: func(field interface{}) {
+				m := field.([]string)
+				Equal(t, len(m), 0)
+				Equal(t, cap(m), 0)
+			},
+		},
+		{
+			name:  "set slice with capacity",
+			field: ([]string)(nil),
+			tags:  "set=5",
+			vf: func(field interface{}) {
+				m := field.([]string)
+				Equal(t, len(m), 0)
+				Equal(t, cap(m), 5)
+			},
+		},
+		{
+			name:  "default chan",
+			field: (chan struct{})(nil),
+			tags:  "default",
+			vf: func(field interface{}) {
+				m := field.(chan struct{})
+				Equal(t, len(m), 0)
+				Equal(t, cap(m), 0)
+			},
+		},
+		{
+			name:  "default chan with buffer",
+			field: (chan struct{})(nil),
+			tags:  "default=5",
+			vf: func(field interface{}) {
+				m := field.(chan struct{})
+				Equal(t, len(m), 0)
+				Equal(t, cap(m), 5)
+			},
+		},
+		{
+			name:  "default time.Time",
+			field: time.Time{},
+			tags:  "default",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.Local)
+			},
+		},
+		{
+			name:  "default time.Time utc",
+			field: time.Time{},
+			tags:  "default=utc",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.UTC)
+			},
+		},
+		{
+			name:  "default time.Time to value",
+			field: time.Time{},
+			tags:  "default=2023-05-28T15:50:31Z",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.UTC)
+
+				tm, err := time.Parse(time.RFC3339Nano, "2023-05-28T15:50:31Z")
+				Equal(t, err, nil)
+				Equal(t, tm.Equal(m), true)
+
+			},
+		},
+		{
+			name:  "set time.Time",
+			field: time.Time{},
+			tags:  "set",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.Local)
+			},
+		},
+		{
+			name:  "set time.Time utc",
+			field: time.Time{},
+			tags:  "set=utc",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.UTC)
+			},
+		},
+		{
+			name:  "set time.Time to value",
+			field: time.Time{},
+			tags:  "set=2023-05-28T15:50:31Z",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.UTC)
+
+				tm, err := time.Parse(time.RFC3339Nano, "2023-05-28T15:50:31Z")
+				Equal(t, err, nil)
+				Equal(t, tm.Equal(m), true)
+
+			},
+		},
+		{
+			name:  "default pointer to slice",
+			field: (*[]string)(nil),
+			tags:  "default",
+			vf: func(field interface{}) {
+				m := field.([]string)
+				Equal(t, len(m), 0)
+			},
+		},
+		{
+			name:  "set pointer to slice",
+			field: (*[]string)(nil),
+			tags:  "set",
+			vf: func(field interface{}) {
+				m := field.([]string)
+				Equal(t, len(m), 0)
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			err := conform.Field(context.Background(), &tc.field, tc.tags)
+			if tc.expectError {
+				NotEqual(t, err, nil)
+				return
+			}
+			Equal(t, err, nil)
+			tc.vf(tc.field)
+		})
+	}
+}
+
 func TestSet(t *testing.T) {
 
 	type State int

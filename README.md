@@ -1,6 +1,6 @@
 Package mold
 ============
-![Project status](https://img.shields.io/badge/version-4.4.0-green.svg)
+![Project status](https://img.shields.io/badge/version-4.5.0-green.svg)
 [![Build Status](https://travis-ci.org/go-playground/mold.svg?branch=v2)](https://travis-ci.org/go-playground/mold)
 [![Coverage Status](https://coveralls.io/repos/github/go-playground/mold/badge.svg?branch=v2)](https://coveralls.io/github/go-playground/mold?branch=v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-playground/mold)](https://goreportcard.com/report/github.com/go-playground/mold)
@@ -58,7 +58,14 @@ These functions modify the data in-place.
 | ucase               | Uppercases the data.                                                                      |
 | ucfirst             | Upper cases the first character of the data.                                              |
 
+**Special Notes:**
+`default` and `set` modifiers are special in that they can be used to set the value of a field or underlying type information or attributes and both use the same underlying function to set the data.
 
+Setting a Param will have the following special effects on data types where it's not just the value being set:
+- Chan - param used to set the buffer size, default = 0.
+- Slice - param used to set the capacity, default = 0.
+- Map - param used to set the size, default = 0.
+- time.Time - param used to set the time format OR value, default = time.Now(), `utc` = time.Now().UTC(), other tries to parse using RFC3339Nano and set a time value.
 
 Scrubbers
 ----------
