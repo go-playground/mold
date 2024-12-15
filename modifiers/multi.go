@@ -17,7 +17,7 @@ var (
 
 // defaultValue allows setting of a default value IF no value is already present.
 func defaultValue(ctx context.Context, fl mold.FieldLevel) error {
-	if !fl.Field().IsZero() {
+	if mold.HasValue(fl.Field()) {
 		return nil
 	}
 	return setValue(ctx, fl)
@@ -125,7 +125,25 @@ func setValue(ctx context.Context, fl mold.FieldLevel) error {
 		fl.Field().Set(reflect.MakeChan(fl.Field().Type(), buffer))
 
 	case reflect.Ptr:
+		// Handle pointer fields by:
+		// 1. Creating a new pointer point to empty value with reflect.New()
 		fl.Field().Set(reflect.New(fl.Field().Type().Elem()))
+
+		// 2. Attempting to set its underlying value
+		// Try to convert the parameter string to the appropriate primitive type
+		// that the pointer references (e.g., *string, *int, *bool)
+		value, err := mold.GetPrimitiveValue(fl.Field().Type().Elem(), fl.Param())
+		if err != nil {
+			// If ErrUnsupportedType: leave as zero value
+			if _, isUnsupportedType := err.(*mold.ErrUnsupportedType); isUnsupportedType {
+				break
+			}
+			// For all other errors except ErrUnsupportedType: propagate the error
+			return err
+		}
+		// If no error: set the underlying value
+		fl.Field().Elem().Set(value)
+
 	}
 	return nil
 }

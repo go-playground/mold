@@ -264,7 +264,7 @@ func (t *Transformer) setByField(ctx context.Context, orig reflect.Value, ct *cT
 					}); err != nil {
 						return
 					}
-					orig.Set(reflect.Indirect(newVal))
+					orig.Set(newVal)
 					current, kind = t.extractType(orig)
 				} else {
 					if err = ct.fn(ctx, fieldLevel{

@@ -18,6 +18,16 @@ var (
 	ErrInvalidKeysTag = errors.New("'" + keysTag + "' tag must be immediately preceeded by the '" + diveTag + "' tag")
 )
 
+// ErrUnsupportedType describes an unsupported field type
+type ErrUnsupportedType struct {
+	typ reflect.Type
+}
+
+// Error returns the UnsupportedType error text
+func (e *ErrUnsupportedType) Error() string {
+	return fmt.Sprintf("mold: unsupported field type: %s", e.typ.Kind())
+}
+
 // ErrUndefinedTag defines a tag that does not exist
 type ErrUndefinedTag struct {
 	tag   string

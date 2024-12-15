@@ -2,6 +2,7 @@ package mold
 
 import (
 	"reflect"
+	"strconv"
 )
 
 // extractType gets the actual underlying type of field value.
@@ -35,4 +36,48 @@ func HasValue(field reflect.Value) bool {
 	default:
 		return field.IsValid() && field.Interface() != reflect.Zero(field.Type()).Interface()
 	}
+}
+
+func GetPrimitiveValue(typ reflect.Type, value string) (reflect.Value, error) {
+	switch typ.Kind() {
+
+	case reflect.String:
+		return reflect.ValueOf(value), nil
+
+	case reflect.Int:
+		value, err := strconv.Atoi(value)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(value), nil
+
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		value, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(int64(value)), nil
+
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		value, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(uint64(value)), nil
+
+	case reflect.Float32, reflect.Float64:
+		value, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(value), nil
+
+	case reflect.Bool:
+		value, err := strconv.ParseBool(value)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return reflect.ValueOf(value), nil
+	}
+	return reflect.Value{}, &ErrUnsupportedType{typ: typ}
 }
