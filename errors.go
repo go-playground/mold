@@ -20,12 +20,23 @@ var (
 
 // ErrUnsupportedType describes an unsupported field type
 type ErrUnsupportedType struct {
-	typ reflect.Type
+	typ reflect.Kind
 }
 
 // Error returns the UnsupportedType error text
 func (e *ErrUnsupportedType) Error() string {
-	return fmt.Sprintf("mold: unsupported field type: %s", e.typ.Kind())
+	return fmt.Sprintf("mold: unsupported field type: %s", e.typ)
+}
+
+// ErrFailedToParseValue describes an error while parsing a value
+type ErrFailedToParseValue struct {
+	typ reflect.Kind
+	err error
+}
+
+// Error returns the FailedToParseValue error text
+func (e *ErrFailedToParseValue) Error() string {
+	return fmt.Sprintf("mold: failed to parse value for type %s: %s", e.typ, e.err.Error())
 }
 
 // ErrUndefinedTag defines a tag that does not exist

@@ -132,7 +132,7 @@ func setValue(ctx context.Context, fl mold.FieldLevel) error {
 		// 2. Attempting to set its underlying value
 		// Try to convert the parameter string to the appropriate primitive type
 		// that the pointer references (e.g., *string, *int, *bool)
-		value, err := mold.GetPrimitiveValue(fl.Field().Type().Elem(), fl.Param())
+		value, err := mold.GetPrimitiveValue(fl.Field().Type().Elem().Kind(), fl.Param())
 		if err != nil {
 			// If ErrUnsupportedType: leave as zero value
 			if _, isUnsupportedType := err.(*mold.ErrUnsupportedType); isUnsupportedType {

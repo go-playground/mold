@@ -38,8 +38,8 @@ func HasValue(field reflect.Value) bool {
 	}
 }
 
-func GetPrimitiveValue(typ reflect.Type, value string) (reflect.Value, error) {
-	switch typ.Kind() {
+func GetPrimitiveValue(typ reflect.Kind, value string) (reflect.Value, error) {
+	switch typ {
 
 	case reflect.String:
 		return reflect.ValueOf(value), nil
@@ -47,35 +47,35 @@ func GetPrimitiveValue(typ reflect.Type, value string) (reflect.Value, error) {
 	case reflect.Int:
 		value, err := strconv.Atoi(value)
 		if err != nil {
-			return reflect.Value{}, err
+			return reflect.Value{}, &ErrFailedToParseValue{typ: typ, err: err}
 		}
 		return reflect.ValueOf(value), nil
 
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		value, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
-			return reflect.Value{}, err
+			return reflect.Value{}, &ErrFailedToParseValue{typ: typ, err: err}
 		}
 		return reflect.ValueOf(int64(value)), nil
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		value, err := strconv.ParseUint(value, 10, 64)
 		if err != nil {
-			return reflect.Value{}, err
+			return reflect.Value{}, &ErrFailedToParseValue{typ: typ, err: err}
 		}
 		return reflect.ValueOf(uint64(value)), nil
 
 	case reflect.Float32, reflect.Float64:
 		value, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return reflect.Value{}, err
+			return reflect.Value{}, &ErrFailedToParseValue{typ: typ, err: err}
 		}
 		return reflect.ValueOf(value), nil
 
 	case reflect.Bool:
 		value, err := strconv.ParseBool(value)
 		if err != nil {
-			return reflect.Value{}, err
+			return reflect.Value{}, &ErrFailedToParseValue{typ: typ, err: err}
 		}
 		return reflect.ValueOf(value), nil
 	}
