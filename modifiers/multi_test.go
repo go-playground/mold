@@ -170,6 +170,20 @@ func TestDefaultSetSpecialTypes(t *testing.T) {
 			},
 		},
 		{
+			name:  "set *time.Time to value",
+			field: (*time.Time)(nil),
+			tags:  "set=2023-05-28T15:50:31Z",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.UTC)
+
+				tm, err := time.Parse(time.RFC3339Nano, "2023-05-28T15:50:31Z")
+				Equal(t, err, nil)
+				Equal(t, tm.Equal(m), true)
+
+			},
+		},
+		{
 			name:  "default pointer to slice",
 			field: (*[]string)(nil),
 			tags:  "default",
@@ -185,6 +199,32 @@ func TestDefaultSetSpecialTypes(t *testing.T) {
 			vf: func(field interface{}) {
 				m := field.([]string)
 				Equal(t, len(m), 0)
+			},
+		}, {
+			name:  "default pointer to int",
+			field: (*int)(nil),
+			tags:  "default=5",
+			vf: func(field interface{}) {
+				m := field.(int)
+				Equal(t, m, 5)
+			},
+		},
+		{
+			name:  "default pointer to string",
+			field: (*string)(nil),
+			tags:  "default=test",
+			vf: func(field interface{}) {
+				m := field.(string)
+				Equal(t, m, "test")
+			},
+		},
+		{
+			name:  "set pointer to string",
+			field: (*string)(nil),
+			tags:  "set",
+			vf: func(field interface{}) {
+				m := field.(string)
+				Equal(t, m, "")
 			},
 		},
 	}
@@ -409,6 +449,42 @@ func TestDefault(t *testing.T) {
 			tags:        "default=blue",
 			expectError: true,
 		},
+		{
+			name:     "default nil pointer to int",
+			field:    (*int)(nil),
+			tags:     "default=3",
+			expected: 3,
+		},
+		{
+			name:     "default not nil pointer to int",
+			field:    newPointer(1),
+			tags:     "default=3",
+			expected: 1,
+		},
+		{
+			name:     "default nil pointer to string",
+			field:    (*string)(nil),
+			tags:     "default=test",
+			expected: "test",
+		},
+		{
+			name:     "default not nil pointer to string",
+			field:    newPointer("existing_value"),
+			tags:     "default=test",
+			expected: "existing_value",
+		},
+		{
+			name:     "default nil pointer to bool",
+			field:    (*bool)(nil),
+			tags:     "default=true",
+			expected: true,
+		},
+		{
+			name:     "default not nil pointer to bool",
+			field:    newPointer(true),
+			tags:     "default=true",
+			expected: true,
+		},
 	}
 
 	for _, tc := range tests {
@@ -499,4 +575,8 @@ func TestEmpty(t *testing.T) {
 			Equal(t, tc.field, tc.expected)
 		})
 	}
+}
+
+func newPointer[T any](value T) *T {
+	return &value
 }
