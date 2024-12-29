@@ -23,115 +23,121 @@ func defaultValue(ctx context.Context, fl mold.FieldLevel) error {
 	return setValue(ctx, fl)
 }
 
+func setValue(_ context.Context, fl mold.FieldLevel) error {
+	return setValueInner(fl.Field(), fl.Param())
+}
+
 // setValue allows setting of a specified value
-func setValue(ctx context.Context, fl mold.FieldLevel) error {
-	switch fl.Field().Kind() {
+func setValueInner(field reflect.Value, param string) error {
+	switch field.Kind() {
 	case reflect.String:
-		fl.Field().SetString(fl.Param())
+		field.SetString(param)
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
-		value, err := strconv.Atoi(fl.Param())
+		value, err := strconv.Atoi(param)
 		if err != nil {
 			return err
 		}
-		fl.Field().SetInt(int64(value))
+		field.SetInt(int64(value))
 
 	case reflect.Int64:
 		var value int64
 
-		if fl.Field().Type() == durationType {
-			d, err := time.ParseDuration(fl.Param())
+		if field.Type() == durationType {
+			d, err := time.ParseDuration(param)
 			if err != nil {
 				return err
 			}
 			value = int64(d)
 		} else {
-			i, err := strconv.Atoi(fl.Param())
+			i, err := strconv.Atoi(param)
 			if err != nil {
 				return err
 			}
 			value = int64(i)
 		}
-		fl.Field().SetInt(value)
+		field.SetInt(value)
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		value, err := strconv.Atoi(fl.Param())
+		value, err := strconv.Atoi(param)
 		if err != nil {
 			return err
 		}
-		fl.Field().SetUint(uint64(value))
+		field.SetUint(uint64(value))
 
 	case reflect.Float32, reflect.Float64:
-		value, err := strconv.ParseFloat(fl.Param(), 64)
+		value, err := strconv.ParseFloat(param, 64)
 		if err != nil {
 			return err
 		}
-		fl.Field().SetFloat(value)
+		field.SetFloat(value)
 
 	case reflect.Bool:
-		value, err := strconv.ParseBool(fl.Param())
+		value, err := strconv.ParseBool(param)
 		if err != nil {
 			return err
 		}
-		fl.Field().SetBool(value)
+		field.SetBool(value)
 
 	case reflect.Map:
 		var n int
 		var err error
-		if fl.Param() != "" {
-			n, err = strconv.Atoi(fl.Param())
+		if param != "" {
+			n, err = strconv.Atoi(param)
 			if err != nil {
 				return err
 			}
 		}
-		fl.Field().Set(reflect.MakeMapWithSize(fl.Field().Type(), n))
+		field.Set(reflect.MakeMapWithSize(field.Type(), n))
 
 	case reflect.Slice:
 		var cap int
 		var err error
-		if fl.Param() != "" {
-			cap, err = strconv.Atoi(fl.Param())
+		if param != "" {
+			cap, err = strconv.Atoi(param)
 			if err != nil {
 				return err
 			}
 		}
-		fl.Field().Set(reflect.MakeSlice(fl.Field().Type(), 0, cap))
+		field.Set(reflect.MakeSlice(field.Type(), 0, cap))
 
 	case reflect.Struct:
-		if fl.Field().Type() == timeType {
-			if fl.Param() != "" {
-				if strings.ToLower(fl.Param()) == "utc" {
-					fl.Field().Set(reflect.ValueOf(time.Now().UTC()))
+		if field.Type() == timeType {
+			if param != "" {
+				if strings.ToLower(param) == "utc" {
+					field.Set(reflect.ValueOf(time.Now().UTC()))
 				} else {
-					t, err := time.Parse(time.RFC3339Nano, fl.Param())
+					t, err := time.Parse(time.RFC3339Nano, param)
 					if err != nil {
 						return err
 					}
-					fl.Field().Set(reflect.ValueOf(t))
+					field.Set(reflect.ValueOf(t))
 				}
 			} else {
-				fl.Field().Set(reflect.ValueOf(time.Now()))
+				field.Set(reflect.ValueOf(time.Now()))
 			}
 		}
 	case reflect.Chan:
 		var buffer int
 		var err error
-		if fl.Param() != "" {
-			buffer, err = strconv.Atoi(fl.Param())
+		if param != "" {
+			buffer, err = strconv.Atoi(param)
 			if err != nil {
 				return err
 			}
 		}
-		fl.Field().Set(reflect.MakeChan(fl.Field().Type(), buffer))
+		field.Set(reflect.MakeChan(field.Type(), buffer))
 
 	case reflect.Ptr:
-		fl.Field().Set(reflect.New(fl.Field().Type().Elem()))
+
+		field.Set(reflect.New(field.Type().Elem()))
+		return setValueInner(field.Elem(), param)
 	}
 	return nil
 }
 
 // empty sets the field to the zero value of the field type
-func empty(ctx context.Context, fl mold.FieldLevel) error {
+func empty(_ context.Context, fl mold.FieldLevel) error {
 	zeroValue := reflect.Zero(fl.Field().Type())
 	fl.Field().Set(zeroValue)
 	return nil
