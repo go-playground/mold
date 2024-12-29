@@ -170,6 +170,20 @@ func TestDefaultSetSpecialTypes(t *testing.T) {
 			},
 		},
 		{
+			name:  "set *time.Time to value",
+			field: (*time.Time)(nil),
+			tags:  "set=2023-05-28T15:50:31Z",
+			vf: func(field interface{}) {
+				m := field.(time.Time)
+				Equal(t, m.Location(), time.UTC)
+
+				tm, err := time.Parse(time.RFC3339Nano, "2023-05-28T15:50:31Z")
+				Equal(t, err, nil)
+				Equal(t, tm.Equal(m), true)
+
+			},
+		},
+		{
 			name:  "default pointer to slice",
 			field: (*[]string)(nil),
 			tags:  "default",
